@@ -214,6 +214,29 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
 .empty{padding:48px;text-align:center;color:var(--text3);font-size:13.2px;display:none}
 .empty.show{display:block}
 .gtip{position:fixed;background:var(--text);color:var(--bg2);border-radius:var(--r);padding:7px 11px;font-size:12.1px;pointer-events:none;z-index:100;max-width:220px;display:none;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+/* login overlay */
+.login-scrim{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-scrim.hidden{display:none}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:36px 32px;max-width:420px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.04)}
+.login-logo{font-family:var(--font-head);font-size:22px;font-weight:600;letter-spacing:-.3px;margin-bottom:6px}
+.login-logo span{color:var(--accent)}
+.login-sub{font-size:13.2px;color:var(--text2);margin-bottom:22px;line-height:1.5}
+.login-label{font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px;font-weight:500}
+.login-input{font-family:var(--font-body);font-size:14.3px;width:100%;padding:10px 12px;border-radius:var(--r);border:1px solid var(--border2);background:var(--surface);color:var(--text);outline:none;transition:border-color .15s}
+.login-input:focus{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(74,133,184,.12)}
+.login-btn{font-family:var(--font-body);font-size:14.3px;font-weight:500;width:100%;padding:11px;border-radius:var(--r);border:1px solid var(--accent2);background:var(--accent);color:#fff;cursor:pointer;margin-top:14px;transition:all .15s}
+.login-btn:hover{background:#264f74;border-color:#264f74}
+.login-btn:disabled{opacity:.55;cursor:not-allowed}
+.login-msg{font-size:12.5px;margin-top:14px;padding:10px 12px;border-radius:var(--r);line-height:1.5;display:none}
+.login-msg.show{display:block}
+.login-msg.info{background:var(--ongoing-bg);color:var(--ongoing-text);border:1px solid #b5cef0}
+.login-msg.error{background:var(--asap-bg);color:var(--asap-text);border:1px solid var(--asap-dot)}
+.login-msg.success{background:var(--done-bg);color:var(--done-text);border:1px solid var(--done-dot)}
+.login-hint{font-size:11.5px;color:var(--text3);margin-top:18px;text-align:center;line-height:1.5}
+.user-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text2);padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;margin-right:4px}
+.user-chip-email{font-weight:500;color:var(--text);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logout-link{background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:2px 4px;font-family:var(--font-body);text-decoration:underline;text-decoration-color:var(--border2);transition:color .15s}
+.logout-link:hover{color:var(--asap-text)}
 </style>
 </head>
 <body>
@@ -226,6 +249,8 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
     <button class="tab" onclick="showTab('timelog',this)">Time log</button>
   </div>
   <div class="top-actions">
+    <span class="user-chip" id="user-chip" style="display:none"><span class="user-chip-email" id="user-chip-email"></span></span>
+    <button class="logout-link" id="logout-btn" onclick="signOut()" style="display:none">Log out</button>
     <span id="sync-status" style="font-size:11px;color:var(--text3);margin-right:6px;font-weight:500"></span>
     <button class="btn" onclick="exportCSV()">Export CSV</button>
     <button class="btn accent" onclick="saveAll()">Save ⌘S</button>
@@ -295,11 +320,25 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
 <div class="toast" id="toast"></div>
 <div class="gtip" id="gtip"></div>
 
+<!-- login overlay -->
+<div class="login-scrim" id="login-scrim">
+  <div class="login-card">
+    <div class="login-logo">proj<span>.</span>track</div>
+    <div class="login-sub">Sign in with your invited email. We'll send you a magic link — click it and you're in.</div>
+    <label class="login-label" for="login-email">Email</label>
+    <input class="login-input" id="login-email" type="email" autocomplete="email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')sendMagicLink()">
+    <button class="login-btn" id="login-btn" onclick="sendMagicLink()">Send magic link</button>
+    <div class="login-msg" id="login-msg"></div>
+    <div class="login-hint">Only invited addresses can sign in. Contact the project owner if you need access.</div>
+  </div>
+</div>
+
 <script>
 // ============ SUPABASE CLOUD SYNC ============
 const SUPABASE_URL = 'https://pbhtsbkashuiirnconcj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiaHRzYmthc2h1aWlybmNvbmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MzkxMDEsImV4cCI6MjA5MjAxNTEwMX0.Y7xdmCLyvEuqeiHt470ZIec_xfH9F_n8JJlzM1Wq1n4';
 let sb=null, cloudOn=false, syncTimer=null, syncing=false;
+let currentUser=null; // auth state
 try{
   if(SUPABASE_URL&&SUPABASE_ANON_KEY&&window.supabase){
     sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
@@ -312,7 +351,7 @@ function setSyncStatus(s){const el=document.getElementById('sync-status');if(!el
   el.textContent=m[s].t;el.style.color=m[s].c;
 }
 async function cloudPull(){
-  if(!cloudOn)return null;
+  if(!cloudOn||!currentUser)return null;
   try{
     setSyncStatus('syncing');
     const[aRes,lRes]=await Promise.all([sb.from('actions').select('*').order('id'),sb.from('time_logs').select('*').order('id',{ascending:false})]);
@@ -324,7 +363,7 @@ async function cloudPull(){
   }catch(e){console.error('cloudPull failed',e);setSyncStatus('error');return null;}
 }
 async function cloudPush(){
-  if(!cloudOn||syncing)return;
+  if(!cloudOn||!currentUser||syncing)return;
   syncing=true;setSyncStatus('syncing');
   try{
     const acts=rows.map(r=>({id:r.id,action:r.action,who:r.who||'',status:r.status,priority:r.priority||'Medium',start_date:r.start||'',due_date:r.due||'',est:r.est||0,comments:r.comments||[]}));
@@ -349,10 +388,78 @@ async function cloudPush(){
   finally{syncing=false;}
 }
 function scheduleSync(){
-  if(!cloudOn)return;
+  if(!cloudOn||!currentUser)return;
   clearTimeout(syncTimer);
   syncTimer=setTimeout(()=>cloudPush(),800);
 }
+
+// ============ AUTH ============
+function showLogin(){document.getElementById('login-scrim').classList.remove('hidden');}
+function hideLogin(){document.getElementById('login-scrim').classList.add('hidden');}
+function setLoginMsg(text,type){
+  const el=document.getElementById('login-msg');
+  if(!text){el.classList.remove('show');return;}
+  el.className='login-msg show '+(type||'info');
+  el.textContent=text;
+}
+async function sendMagicLink(){
+  const emailEl=document.getElementById('login-email');
+  const btn=document.getElementById('login-btn');
+  const email=(emailEl.value||'').trim().toLowerCase();
+  if(!email||!email.includes('@')){setLoginMsg('Please enter a valid email address.','error');return;}
+  if(!sb){setLoginMsg('Authentication is not configured.','error');return;}
+  btn.disabled=true;btn.textContent='Sending…';
+  setLoginMsg('','');
+  try{
+    const{error}=await sb.auth.signInWithOtp({
+      email,
+      options:{
+        emailRedirectTo:window.location.href.split('#')[0].split('?')[0],
+        shouldCreateUser:false // critical: don't auto-create users, only allow invited ones
+      }
+    });
+    if(error)throw error;
+    setLoginMsg('✓ Check your email — click the magic link to sign in. You can close this tab; the link will open the tracker in a new one.','success');
+    btn.textContent='Sent ✓';
+    setTimeout(()=>{btn.disabled=false;btn.textContent='Send magic link';},8000);
+  }catch(e){
+    console.error('signInWithOtp failed',e);
+    const msg=(e&&e.message)||'Could not send the magic link.';
+    // Supabase returns "Signups not allowed for otp" when email isn't invited
+    if(/signup|not allowed|not_allowed/i.test(msg)){
+      setLoginMsg("This email isn't on the invite list. Ask the project owner to add you in Supabase → Authentication → Users.",'error');
+    }else{
+      setLoginMsg(msg,'error');
+    }
+    btn.disabled=false;btn.textContent='Send magic link';
+  }
+}
+async function signOut(){
+  if(!sb)return;
+  await sb.auth.signOut();
+  currentUser=null;
+  updateAuthUI();
+  showLogin();
+  // clear in-memory data so a different user signing in starts fresh
+  rows=[];logs=[];
+  renderTable();
+  setSyncStatus('idle');
+}
+function updateAuthUI(){
+  const chip=document.getElementById('user-chip');
+  const chipEmail=document.getElementById('user-chip-email');
+  const logoutBtn=document.getElementById('logout-btn');
+  if(currentUser){
+    chipEmail.textContent=currentUser.email||'signed in';
+    chip.style.display='';
+    logoutBtn.style.display='';
+  }else{
+    chip.style.display='none';
+    logoutBtn.style.display='none';
+  }
+}
+// ============ END AUTH ============
+
 // ============ END SUPABASE ============
 
 const today=new Date();today.setHours(0,0,0,0);
@@ -394,7 +501,7 @@ function loadTimerState(){
 async function load(){
   loadLocal(); // always hydrate from localStorage first for instant render
   loadTimerState();
-  if(cloudOn){
+  if(cloudOn&&currentUser){
     const cloud=await cloudPull();
     if(cloud){
       // cloud is source of truth when available
@@ -513,7 +620,7 @@ function buildCP(r){
   return`<div class="cp"><div class="cl">${list}</div>
     <div class="cir">
       <div class="cic">
-        <input class="cni" id="can-${r.id}" placeholder="Your name" value="${esc(lastA)}">
+        <input class="cni" id="can-${r.id}" placeholder="Your name" value="${esc(lastA||(currentUser&&currentUser.email)||'')}">
         <textarea class="cti" id="ctx-${r.id}" placeholder="Write a comment… (Enter to post, Shift+Enter for new line)" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();postC(${r.id})}"></textarea>
       </div>
       <button class="cpb" onclick="postC(${r.id})">Post</button>
@@ -627,12 +734,55 @@ document.addEventListener('keydown',e=>{
 
 // offline/online awareness
 window.addEventListener('offline',()=>setSyncStatus('offline'));
-window.addEventListener('online',()=>{setSyncStatus('idle');if(cloudOn)cloudPush();});
+window.addEventListener('online',()=>{setSyncStatus('idle');if(cloudOn&&currentUser)cloudPush();});
 
 // boot
-setSyncStatus(cloudOn?(navigator.onLine?'idle':'offline'):'idle');
-renderTable();popSels();
-load().then(()=>{renderTable();popSels();});
+async function boot(){
+  if(!cloudOn){
+    // no Supabase configured — skip auth, load from localStorage
+    hideLogin();
+    setSyncStatus('idle');
+    renderTable();popSels();
+    await load();
+    renderTable();popSels();
+    return;
+  }
+  // check existing session (magic-link redirect drops a token in the URL hash)
+  const{data:{session}}=await sb.auth.getSession();
+  if(session&&session.user){
+    currentUser=session.user;
+    hideLogin();
+    updateAuthUI();
+    setSyncStatus(navigator.onLine?'idle':'offline');
+    renderTable();popSels();
+    await load();
+    renderTable();popSels();
+  }else{
+    showLogin();
+    setTimeout(()=>document.getElementById('login-email')?.focus(),100);
+  }
+  // react to auth changes (sign-in, sign-out, token refresh)
+  sb.auth.onAuthStateChange(async(event,newSession)=>{
+    if(event==='SIGNED_IN'&&newSession){
+      currentUser=newSession.user;
+      hideLogin();
+      updateAuthUI();
+      setSyncStatus(navigator.onLine?'idle':'offline');
+      // clean up any auth fragments in the URL
+      if(window.location.hash.includes('access_token')){
+        history.replaceState(null,'',window.location.pathname+window.location.search);
+      }
+      await load();
+      renderTable();popSels();
+      toast('Welcome, '+(currentUser.email||'back'));
+    }else if(event==='SIGNED_OUT'){
+      currentUser=null;
+      updateAuthUI();
+      showLogin();
+    }
+  });
+}
+boot();
 </script>
 </body>
 </html>
