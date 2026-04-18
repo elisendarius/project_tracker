@@ -8,19 +8,19 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
-  --bg:#f7f5f0; --bg2:#ffffff; --surface:#ffffff; --surface2:#f2f0ea; --surface3:#eae7df;
-  --border:#e4e0d6; --border2:#ccc8bc; --border3:#aaa698;
-  --text:#1c1a16; --text2:#6b6558; --text3:#a09890;
-  --accent:#2d5f8a; --accent-bg:#edf3f9; --accent2:#4a85b8;
-  --pending-bg:#fef6e4; --pending-text:#7a4e0e; --pending-dot:#d4901a;
-  --asap-bg:#fdecea; --asap-text:#8b1f1f; --asap-dot:#d03030;
-  --ongoing-bg:#e8f0fb; --ongoing-text:#1a3d6b; --ongoing-dot:#3a72c4;
-  --done-bg:#e8f5eb; --done-text:#1a5c2a; --done-dot:#3aaa50;
-  --bar-pending:#c8942a; --bar-asap:#c83030; --bar-ongoing:#3a72c4; --bar-done:#3aaa50;
-  --prio-low-bg:#eef2f5; --prio-low-text:#4a5a68; --prio-low-dot:#7a8a98;
-  --prio-med-bg:#fff4e0; --prio-med-text:#8a5a10; --prio-med-dot:#e0a030;
-  --prio-high-bg:#fde4de; --prio-high-text:#8b2a1f; --prio-high-dot:#d04828;
-  --prio-crit-bg:#f5e0ec; --prio-crit-text:#6b1c4a; --prio-crit-dot:#a02868;
+  --bg:#FFEBEE; --bg2:#ffffff; --surface:#ffffff; --surface2:#F7ECEE; --surface3:#EDE2E5;
+  --border:#E4D5D9; --border2:#C5CDD3; --border3:#B0BEC5;
+  --text:#333333; --text2:#607D8B; --text3:#9EB0B8;
+  --accent:#607D8B; --accent-bg:#EEF3F5; --accent2:#7A97A2;
+  --pending-bg:#FEF6E4; --pending-text:#7A4E0E; --pending-dot:#D4901A;
+  --asap-bg:#FCDFE3; --asap-text:#7A1F2A; --asap-dot:#C83030;
+  --ongoing-bg:#EEF3F5; --ongoing-text:#3A5A68; --ongoing-dot:#607D8B;
+  --done-bg:#E8F2EE; --done-text:#2A5C3A; --done-dot:#4A9A60;
+  --bar-pending:#D4901A; --bar-asap:#C83030; --bar-ongoing:#607D8B; --bar-done:#4A9A60;
+  --prio-low-bg:#F5EAEC; --prio-low-text:#607D8B; --prio-low-dot:#B0BEC5;
+  --prio-med-bg:#FEF6E4; --prio-med-text:#7A4E0E; --prio-med-dot:#D4901A;
+  --prio-high-bg:#FCDFE3; --prio-high-text:#7A1F2A; --prio-high-dot:#C83030;
+  --prio-crit-bg:#F0E0EC; --prio-crit-text:#6B1C4A; --prio-crit-dot:#A02868;
   --font-head:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --r:6px; --r-lg:12px;
@@ -32,6 +32,10 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .topbar{display:flex;align-items:center;gap:14px;padding:12px 28px;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:30;flex-wrap:wrap}
 .logo{font-family:var(--font-head);font-size:18.7px;font-weight:600;letter-spacing:-.3px;flex-shrink:0}
 .logo span{color:var(--accent)}
+.proj-name{font-family:var(--font-head);font-size:13.2px;font-weight:500;color:var(--text2);padding:4px 8px;border-radius:var(--r);border:1px solid transparent;background:transparent;outline:none;cursor:pointer;min-width:80px;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:border-color .15s,background .15s}
+.proj-name:hover{border-color:var(--border);background:var(--surface2)}
+.proj-name:focus{border-color:var(--border2);background:var(--surface);cursor:text;color:var(--text)}
+.proj-sep{width:1px;height:16px;background:var(--border2);flex-shrink:0}
 .tabs{display:flex;gap:2px;flex:1}
 .tab{font-family:var(--font-body);font-size:13.2px;padding:6px 14px;border-radius:var(--r);border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap}
 .tab:hover{color:var(--text2);background:var(--surface2)}
@@ -76,7 +80,7 @@ th{font-family:var(--font-body);font-size:11px;font-weight:400;letter-spacing:.1
 tbody tr.dr{border-bottom:1px solid var(--border);transition:background .1s}
 tbody tr.dr:hover{background:var(--surface2)}
 tbody tr.dr.hidden{display:none}
-tbody tr.dr.editing{background:#fdfcf8}
+tbody tr.dr.editing{background:#F9F0F2}
 tbody tr.cr{border-bottom:1px solid var(--border);display:none}
 tbody tr.cr.open{display:table-row}
 td{padding:11px 14px;vertical-align:top;color:var(--text);font-size:13.75px}
@@ -150,11 +154,11 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
 
 /* ── comment panel ── */
 .cp-cell{padding:0!important}
-.cp{padding:16px 20px 16px 42px;border-left:3px solid var(--accent2);background:#faf9f5}
+.cp{padding:16px 20px 16px 42px;border-left:3px solid var(--accent2);background:#F5EAEC}
 .cl{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
 .ci{display:flex;gap:10px;animation:cf .18s ease}
 @keyframes cf{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
-.cav{width:28px;height:28px;border-radius:50%;background:var(--ongoing-bg);color:var(--ongoing-text);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;font-family:var(--font-head);border:1px solid #c8dff5}
+.cav{width:28px;height:28px;border-radius:50%;background:var(--ongoing-bg);color:var(--ongoing-text);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;font-family:var(--font-head);border:1px solid var(--border2)}
 .cb{flex:1;min-width:0}
 .ch{display:flex;align-items:baseline;gap:8px;margin-bottom:3px}
 .cau{font-size:13.2px;font-weight:500;color:var(--text)}
@@ -324,6 +328,9 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
 <div class="app">
 <div class="topbar">
   <div class="logo">proj<span>.</span>track</div>
+  <span class="proj-sep"></span>
+  <input class="proj-name" id="proj-name" placeholder="Project name…" title="Click to rename project"
+    onblur="saveProjName()" onkeydown="if(event.key==='Enter'||event.key==='Escape')this.blur()">
   <div class="tabs">
     <button class="tab active" onclick="showTab('overview',this)">Overview</button>
     <button class="tab" onclick="showTab('actions',this)">Actions</button>
@@ -484,12 +491,12 @@ function scheduleSync(){
 // ============ THEME SYSTEM ============
 const THEMES = ['Data','Equipment','Communication','Analysis','Admin','General'];
 const TM = {
-  'Data':          {bg:'#e8f0fb',text:'#1a3d6b',dot:'#3a72c4'},
-  'Equipment':     {bg:'#fef0e0',text:'#7a3a10',dot:'#c87030'},
-  'Communication': {bg:'#e9f5ec',text:'#1a5c2a',dot:'#3aaa50'},
-  'Analysis':      {bg:'#f2eafb',text:'#4a1c7a',dot:'#8050c8'},
-  'Admin':         {bg:'#eef2f5',text:'#3a4a58',dot:'#6a7a88'},
-  'General':       {bg:'#f2f0ea',text:'#4a4238',dot:'#8a7a68'},
+  'Data':          {bg:'#EEF3F5',text:'#3A5A68',dot:'#607D8B'},
+  'Equipment':     {bg:'#FEF6E4',text:'#7A4510',dot:'#C87030'},
+  'Communication': {bg:'#E8F2EE',text:'#2A5C3A',dot:'#4A9A60'},
+  'Analysis':      {bg:'#F2EAF8',text:'#4A1C7A',dot:'#8050C8'},
+  'Admin':         {bg:'#EDF0F3',text:'#3A4A58',dot:'#B0BEC5'},
+  'General':       {bg:'#FFEBEE',text:'#5A3A42',dot:'#C8909A'},
 };
 function thm(t){return TM[t]||TM['General'];}
 
@@ -1099,6 +1106,20 @@ document.addEventListener('keydown',e=>{
 
 window.addEventListener('offline',()=>setSyncStatus('offline'));
 window.addEventListener('online',()=>{setSyncStatus('idle');if(cloudOn)cloudPush();});
+
+// project name
+function saveProjName(){
+  const el=document.getElementById('proj-name');
+  const v=el.value.trim();
+  el.value=v;
+  localStorage.setItem('pt4_proj',v);
+  document.title=v?`${v} — proj.track`:'proj.track';
+}
+(function loadProjName(){
+  const v=localStorage.getItem('pt4_proj')||'';
+  const el=document.getElementById('proj-name');
+  if(el){el.value=v;if(v)document.title=`${v} — proj.track`;}
+})();
 
 // boot
 setSyncStatus(cloudOn?(navigator.onLine?'idle':'offline'):'idle');
