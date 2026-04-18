@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Project Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   --bg:#f7f5f0; --bg2:#ffffff; --surface:#ffffff; --surface2:#f2f0ea; --surface3:#eae7df;
@@ -225,6 +226,7 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
     <button class="tab" onclick="showTab('timelog',this)">Time log</button>
   </div>
   <div class="top-actions">
+    <span id="sync-status" style="font-size:11px;color:var(--text3);margin-right:6px;font-weight:500"></span>
     <button class="btn" onclick="exportCSV()">Export CSV</button>
     <button class="btn accent" onclick="saveAll()">Save ⌘S</button>
   </div>
@@ -294,6 +296,65 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
 <div class="gtip" id="gtip"></div>
 
 <script>
+// ============ SUPABASE CLOUD SYNC ============
+const SUPABASE_URL = 'https://pbhtsbkashuiirnconcj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiaHRzYmthc2h1aWlybmNvbmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MzkxMDEsImV4cCI6MjA5MjAxNTEwMX0.Y7xdmCLyvEuqeiHt470ZIec_xfH9F_n8JJlzM1Wq1n4';
+let sb=null, cloudOn=false, syncTimer=null, syncing=false;
+try{
+  if(SUPABASE_URL&&SUPABASE_ANON_KEY&&window.supabase){
+    sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+    cloudOn=true;
+  }
+}catch(e){console.warn('Supabase init failed, using localStorage only',e);}
+
+function setSyncStatus(s){const el=document.getElementById('sync-status');if(!el)return;
+  const m={idle:{t:cloudOn?'☁ Synced':'◉ Local only',c:'var(--text3)'},syncing:{t:'⟳ Syncing…',c:'var(--accent)'},error:{t:'⚠ Sync failed',c:'var(--asap-text)'},offline:{t:'◉ Offline — local only',c:'var(--pending-text)'}};
+  el.textContent=m[s].t;el.style.color=m[s].c;
+}
+async function cloudPull(){
+  if(!cloudOn)return null;
+  try{
+    setSyncStatus('syncing');
+    const[aRes,lRes]=await Promise.all([sb.from('actions').select('*').order('id'),sb.from('time_logs').select('*').order('id',{ascending:false})]);
+    if(aRes.error)throw aRes.error;if(lRes.error)throw lRes.error;
+    const rs=aRes.data.map(r=>({id:r.id,action:r.action,who:r.who||'',status:r.status||'Pending',priority:r.priority||'Medium',start:r.start_date||'',due:r.due_date||'',est:r.est||0,comments:r.comments||[]}));
+    const ls=lRes.data.map(l=>({id:l.id,tid:l.tid,dur:l.dur||0,note:l.note||'',ts:l.ts||new Date().toISOString()}));
+    setSyncStatus('idle');
+    return{rows:rs,logs:ls};
+  }catch(e){console.error('cloudPull failed',e);setSyncStatus('error');return null;}
+}
+async function cloudPush(){
+  if(!cloudOn||syncing)return;
+  syncing=true;setSyncStatus('syncing');
+  try{
+    const acts=rows.map(r=>({id:r.id,action:r.action,who:r.who||'',status:r.status,priority:r.priority||'Medium',start_date:r.start||'',due_date:r.due||'',est:r.est||0,comments:r.comments||[]}));
+    const tls=logs.map(l=>({id:l.id,tid:l.tid,dur:l.dur||0,note:l.note||'',ts:l.ts||''}));
+    const[ea,eal,el]=await Promise.all([
+      sb.from('actions').select('id'),
+      sb.from('time_logs').select('id'),
+      null
+    ].filter(Boolean));
+    const remoteActIds=new Set((ea.data||[]).map(r=>r.id));
+    const remoteLogIds=new Set((eal.data||[]).map(r=>r.id));
+    const localActIds=new Set(acts.map(a=>a.id));
+    const localLogIds=new Set(tls.map(l=>l.id));
+    const delActs=[...remoteActIds].filter(id=>!localActIds.has(id));
+    const delLogs=[...remoteLogIds].filter(id=>!localLogIds.has(id));
+    if(delLogs.length)await sb.from('time_logs').delete().in('id',delLogs);
+    if(delActs.length)await sb.from('actions').delete().in('id',delActs);
+    if(acts.length){const{error}=await sb.from('actions').upsert(acts);if(error)throw error;}
+    if(tls.length){const{error}=await sb.from('time_logs').upsert(tls);if(error)throw error;}
+    setSyncStatus('idle');
+  }catch(e){console.error('cloudPush failed',e);setSyncStatus('error');}
+  finally{syncing=false;}
+}
+function scheduleSync(){
+  if(!cloudOn)return;
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(()=>cloudPush(),800);
+}
+// ============ END SUPABASE ============
+
 const today=new Date();today.setHours(0,0,0,0);
 function ds(n){const d=new Date(today);d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];}
 const DEF=[
@@ -315,7 +376,7 @@ let rows=[],logs=[],nid=20,nlid=100,ncid=200;
 let filt='all',sq='',eid=null,ddid=null,ddpid=null,ocid=null,tlm=3;
 let tiv=null,tstart=null,ttid=null,tel=0,lastA='';
 
-function load(){
+function loadLocal(){
   try{
     const r=localStorage.getItem('pt4_r'),l=localStorage.getItem('pt4_l');
     rows=r?JSON.parse(r):DEF.map(x=>({...x,comments:[]}));
@@ -324,15 +385,43 @@ function load(){
     nid=+(localStorage.getItem('pt4_nid')||20);
     nlid=+(localStorage.getItem('pt4_nlid')||100);
     ncid=+(localStorage.getItem('pt4_ncid')||200);
-    const t=localStorage.getItem('pt4_t');
-    if(t){const ts=JSON.parse(t);if(ts.r){ttid=ts.tid;tstart=new Date(ts.s);tel=ts.e||0;startTUI();}}
   }catch(e){rows=DEF.map(x=>({...x,comments:[]}));}
+}
+function loadTimerState(){
+  const t=localStorage.getItem('pt4_t');
+  if(t){try{const ts=JSON.parse(t);if(ts.r){ttid=ts.tid;tstart=new Date(ts.s);tel=ts.e||0;startTUI();}}catch(e){}}
+}
+async function load(){
+  loadLocal(); // always hydrate from localStorage first for instant render
+  loadTimerState();
+  if(cloudOn){
+    const cloud=await cloudPull();
+    if(cloud){
+      // cloud is source of truth when available
+      if(cloud.rows.length||cloud.logs.length){
+        rows=cloud.rows;logs=cloud.logs;
+        rows.forEach(r=>{if(!r.comments)r.comments=[];if(!r.priority)r.priority='Medium';});
+        // recompute next-id counters so new inserts don't collide
+        nid=Math.max(20,...rows.map(r=>r.id||0))+1;
+        nlid=Math.max(100,...logs.map(l=>l.id||0))+1;
+        ncid=Math.max(200,...rows.flatMap(r=>(r.comments||[]).map(c=>c.id||0)))+1;
+        // persist snapshot to localStorage too
+        localStorage.setItem('pt4_r',JSON.stringify(rows));
+        localStorage.setItem('pt4_l',JSON.stringify(logs));
+        localStorage.setItem('pt4_nid',nid);localStorage.setItem('pt4_nlid',nlid);localStorage.setItem('pt4_ncid',ncid);
+      }else{
+        // cloud is empty — push our seed/local data up so it's populated
+        await cloudPush();
+      }
+      renderTable();
+    }
+  }
 }
 function saveAll(){
   localStorage.setItem('pt4_r',JSON.stringify(rows));
   localStorage.setItem('pt4_l',JSON.stringify(logs));
   localStorage.setItem('pt4_nid',nid);localStorage.setItem('pt4_nlid',nlid);localStorage.setItem('pt4_ncid',ncid);
-  toast('Saved ✓');
+  if(cloudOn){cloudPush().then(()=>toast('Saved ✓'));}else{toast('Saved locally ✓');}
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function sk(s){return(s||'').toLowerCase();}
@@ -438,9 +527,9 @@ function postC(rid){
   if(!t)return;lastA=a;
   const r=rows.find(x=>x.id===rid);if(!r)return;if(!r.comments)r.comments=[];
   r.comments.push({id:ncid++,author:a,text:t,ts:new Date().toISOString()});
-  ocid=rid;renderTable();setTimeout(()=>document.querySelector(`.cr[data-id="${rid}"]`)?.scrollIntoView({behavior:'smooth',block:'nearest'}),40);
+  ocid=rid;renderTable();scheduleSync();setTimeout(()=>document.querySelector(`.cr[data-id="${rid}"]`)?.scrollIntoView({behavior:'smooth',block:'nearest'}),40);
 }
-function delC(rid,cid){const r=rows.find(x=>x.id===rid);if(r)r.comments=(r.comments||[]).filter(c=>c.id!==cid);ocid=rid;renderTable();}
+function delC(rid,cid){const r=rows.find(x=>x.id===rid);if(r)r.comments=(r.comments||[]).filter(c=>c.id!==cid);ocid=rid;renderTable();scheduleSync();}
 
 function setFilt(f){filt=f;renderTable();}
 function onSearch(v){sq=v.trim();renderTable();}
@@ -455,18 +544,18 @@ function openDDP(e,id){
   d.style.top=(rect.bottom+4)+'px';d.style.left=rect.left+'px';
 }
 function closeDD(){document.getElementById('dd').style.display='none';document.getElementById('ddp').style.display='none';document.getElementById('dov').style.display='none';ddid=null;ddpid=null;}
-function setSt(s){const r=rows.find(x=>x.id===ddid);if(r){r.status=s;renderTable();gIfActive();}closeDD();}
-function setPr(p){const r=rows.find(x=>x.id===ddpid);if(r){r.priority=p;renderTable();}closeDD();}
+function setSt(s){const r=rows.find(x=>x.id===ddid);if(r){r.status=s;renderTable();gIfActive();scheduleSync();}closeDD();}
+function setPr(p){const r=rows.find(x=>x.id===ddpid);if(r){r.priority=p;renderTable();scheduleSync();}closeDD();}
 function startE(id){eid=id;ocid=null;renderTable();setTimeout(()=>{const a=document.getElementById('ea');if(a){a.focus();a.select();}},30);}
 function cancelE(){eid=null;renderTable();}
 function saveE(id){
   const r=rows.find(x=>x.id===id);if(!r)return;
   const a=document.getElementById('ea'),w=document.getElementById('ew'),s=document.getElementById('es'),d=document.getElementById('ed'),st=document.getElementById('est'),pr=document.getElementById('epr'),e=document.getElementById('ee');
   if(a)r.action=a.value.trim()||r.action;if(w)r.who=w.value.trim();if(s)r.start=s.value||'';if(d)r.due=d.value||'';if(st)r.status=st.value;if(pr)r.priority=pr.value;if(e)r.est=parseFloat(e.value)||0;
-  eid=null;renderTable();gIfActive();
+  eid=null;renderTable();gIfActive();scheduleSync();
 }
-function addRow(){const id=nid++;rows.push({id,action:'New action',who:'',status:'Pending',priority:'Medium',start:ds(0),due:ds(14),est:0,comments:[]});filt='all';renderTable();startE(id);setTimeout(()=>document.querySelector('#tbody tr:last-child')?.scrollIntoView({behavior:'smooth',block:'center'}),50);}
-function delRow(id){if(!confirm('Delete this action?'))return;rows=rows.filter(r=>r.id!==id);logs=logs.filter(l=>l.tid!==id);if(ocid===id)ocid=null;renderTable();}
+function addRow(){const id=nid++;rows.push({id,action:'New action',who:'',status:'Pending',priority:'Medium',start:ds(0),due:ds(14),est:0,comments:[]});filt='all';renderTable();startE(id);scheduleSync();setTimeout(()=>document.querySelector('#tbody tr:last-child')?.scrollIntoView({behavior:'smooth',block:'center'}),50);}
+function delRow(id){if(!confirm('Delete this action?'))return;rows=rows.filter(r=>r.id!==id);logs=logs.filter(l=>l.tid!==id);if(ocid===id)ocid=null;renderTable();scheduleSync();}
 function exportCSV(){
   const hdr='Action,Responsible,Start,Due,Status,Priority,Est Hours,Logged Hours,Comments\n';
   const body=rows.map(r=>{const cm=(r.comments||[]).map(c=>`[${c.author}: ${c.text}]`).join(' | ');return[`"${(r.action||'').replace(/"/g,'""')}"`,`"${r.who||''}"`,r.start||'',r.due||'',r.status,r.priority||'Medium',r.est||0,(lm(r.id)/60).toFixed(1),`"${cm.replace(/"/g,'""')}"`].join(',');}).join('\n');
@@ -502,11 +591,11 @@ function popSels(){const o=rows.map(r=>`<option value="${r.id}">${r.action.subst
 function startTFor(id){if(tiv)stopT();ttid=id;showTab('timelog',document.querySelectorAll('.tab')[2]);document.getElementById('tts').value=id;startTUI();}
 function toggleTimer(){if(tiv)stopT();else{ttid=parseInt(document.getElementById('tts').value);tel=0;tstart=new Date();startTUI();}}
 function startTUI(){tstart=tstart||new Date();updT();tiv=setInterval(updT,1000);document.getElementById('tmb').textContent='⏹ Stop';document.getElementById('tmb').className='tbm tp';document.getElementById('tdisp').classList.add('running');if(ttid)document.getElementById('tts').value=ttid;localStorage.setItem('pt4_t',JSON.stringify({r:true,tid:ttid,s:tstart.toISOString(),e:tel}));renderTable();}
-function stopT(){if(!tiv)return;clearInterval(tiv);tiv=null;const el2=tel+Math.floor((new Date()-tstart)/1000),mins=Math.max(1,Math.round(el2/60));const tid=ttid||parseInt(document.getElementById('tts').value);logs.unshift({id:nlid++,tid,dur:mins,note:'Timer session',ts:new Date().toISOString()});tstart=null;tel=0;ttid=null;localStorage.removeItem('pt4_t');document.getElementById('tdisp').textContent='00:00:00';document.getElementById('tdisp').classList.remove('running');document.getElementById('tmb').textContent='▶ Start';document.getElementById('tmb').className='tbm ts';renderTL();renderTable();toast('Logged '+fh(mins));}
+function stopT(){if(!tiv)return;clearInterval(tiv);tiv=null;const el2=tel+Math.floor((new Date()-tstart)/1000),mins=Math.max(1,Math.round(el2/60));const tid=ttid||parseInt(document.getElementById('tts').value);logs.unshift({id:nlid++,tid,dur:mins,note:'Timer session',ts:new Date().toISOString()});tstart=null;tel=0;ttid=null;localStorage.removeItem('pt4_t');document.getElementById('tdisp').textContent='00:00:00';document.getElementById('tdisp').classList.remove('running');document.getElementById('tmb').textContent='▶ Start';document.getElementById('tmb').className='tbm ts';renderTL();renderTable();scheduleSync();toast('Logged '+fh(mins));}
 function updT(){const e=tel+Math.floor((new Date()-tstart)/1000);const h=Math.floor(e/3600),m=Math.floor((e%3600)/60),s=e%60;document.getElementById('tdisp').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
 function toggleMf(){document.getElementById('mf').classList.toggle('open');}
-function saveMf(){const tid=parseInt(document.getElementById('mft').value),mins=parseInt(document.getElementById('mfm').value),note=document.getElementById('mfn').value.trim()||'Manual entry';if(!tid||!mins||mins<1){toast('Enter task and duration');return;}logs.unshift({id:nlid++,tid,dur:mins,note,ts:new Date().toISOString()});document.getElementById('mfm').value='';document.getElementById('mfn').value='';document.getElementById('mf').classList.remove('open');renderTL();renderTable();toast('Added '+fh(mins));}
-function delLog(id){logs=logs.filter(l=>l.id!==id);renderTL();renderTable();}
+function saveMf(){const tid=parseInt(document.getElementById('mft').value),mins=parseInt(document.getElementById('mfm').value),note=document.getElementById('mfn').value.trim()||'Manual entry';if(!tid||!mins||mins<1){toast('Enter task and duration');return;}logs.unshift({id:nlid++,tid,dur:mins,note,ts:new Date().toISOString()});document.getElementById('mfm').value='';document.getElementById('mfn').value='';document.getElementById('mf').classList.remove('open');renderTL();renderTable();scheduleSync();toast('Added '+fh(mins));}
+function delLog(id){logs=logs.filter(l=>l.id!==id);renderTL();renderTable();scheduleSync();}
 function renderTL(){
   popSels();
   const ll=document.getElementById('lgl');
@@ -518,12 +607,32 @@ function renderTL(){
 }
 
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
+
+// wrap scheduleSync so it also keeps localStorage snapshot fresh between cloud pushes
+const _origScheduleSync=scheduleSync;
+scheduleSync=function(){
+  try{
+    localStorage.setItem('pt4_r',JSON.stringify(rows));
+    localStorage.setItem('pt4_l',JSON.stringify(logs));
+    localStorage.setItem('pt4_nid',nid);localStorage.setItem('pt4_nlid',nlid);localStorage.setItem('pt4_ncid',ncid);
+  }catch(e){}
+  _origScheduleSync();
+};
+
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeDD();cancelE();}
   if(e.key==='Enter'&&eid&&!e.target.matches('select,textarea'))saveE(eid);
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveAll();}
 });
-load();renderTable();popSels();
+
+// offline/online awareness
+window.addEventListener('offline',()=>setSyncStatus('offline'));
+window.addEventListener('online',()=>{setSyncStatus('idle');if(cloudOn)cloudPush();});
+
+// boot
+setSyncStatus(cloudOn?(navigator.onLine?'idle':'offline'):'idle');
+renderTable();popSels();
+load().then(()=>{renderTable();popSels();});
 </script>
 </body>
 </html>
