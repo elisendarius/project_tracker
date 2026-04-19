@@ -73,7 +73,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .theme-filter-row{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
 .theme-pill{font-family:var(--font-body);font-size:12.1px;padding:4px 12px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .theme-pill:hover{border-color:var(--border2);color:var(--text)}
-.theme-pill.active{font-weight:500}
+.theme-pill.active{font-weight:500;background:var(--surface2);border-color:var(--border3);color:var(--text)}
 .theme-pill .tp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .theme-pill-all{font-family:var(--font-body);font-size:12.1px;padding:4px 12px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap}
 .theme-pill-all:hover{border-color:var(--border2);color:var(--text)}
@@ -300,12 +300,16 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
 
 /* ── theme cards grid ── */
 .ov-section-title{font-family:var(--font-head);font-size:14.3px;font-weight:500;color:var(--text);margin-bottom:12px}
+.ov-card-add{background:var(--surface);border:1.5px dashed var(--border2);border-radius:var(--r-lg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all .2s;color:var(--text3);min-height:120px}
+.ov-card-add:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.ov-card-add-icon{font-size:22px;font-weight:300;line-height:1}
+.ov-card-add-label{font-size:12.1px;font-weight:500}
 .ov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:28px}
-.ov-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px 16px 26px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px 16px 26px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
 .ov-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.07);border-color:var(--border2)}
-.ov-card-accent{position:absolute;left:0;top:0;bottom:0;width:8px}
+.ov-card-accent{position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--border2)}
 .ov-card-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.ov-card-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.ov-card-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--border3)}
 .ov-card-name{font-family:var(--font-head);font-size:14.3px;font-weight:600;color:var(--text)}
 .ov-overdue-badge{margin-left:auto;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:99px;background:var(--asap-bg);color:var(--asap-text)}
 .ov-stacked-bar{height:6px;border-radius:3px;overflow:hidden;display:flex;margin-bottom:12px;background:var(--surface3)}
@@ -338,6 +342,21 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
 .empty.show{display:block}
 .gtip{position:fixed;background:var(--text);color:var(--bg2);border-radius:var(--r);padding:7px 11px;font-size:12.1px;pointer-events:none;z-index:100;max-width:220px;display:none;box-shadow:0 4px 14px rgba(0,0,0,.12)}
 .divider{height:1px;background:var(--border);margin:4px 0}
+/* ── budget modal ── */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;display:flex;align-items:center;justify-content:center}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px 28px;width:100%;max-width:540px;max-height:82vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.18)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-htitle{font-family:var(--font-head);font-size:16px;font-weight:600;color:var(--text)}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);padding:0 4px;line-height:1;transition:color .12s}
+.modal-close:hover{color:var(--text)}
+.modal-sec-label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px}
+.modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.bdg-tbl{width:100%;border-collapse:collapse;margin-bottom:20px}
+.bdg-tbl th{font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:4px 8px 8px;text-align:left;border-bottom:1px solid var(--border2)}
+.bdg-tbl th:last-child{text-align:right}
+.bdg-tbl td{padding:7px 8px;border-bottom:1px solid var(--border);font-size:13.2px;vertical-align:middle}
+.bdg-tbl tr:last-child td{border-bottom:none}
+.bdg-tbl td:last-child{text-align:right}
 </style>
 </head>
 <body>
@@ -404,6 +423,7 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
         <h3>Timer</h3>
         <div class="ticard">
           <div class="ttsel"><label class="tlbl">Task</label><select class="es" id="tts" style="font-size:13.2px"></select></div>
+          <div class="ttsel"><label class="tlbl">PUK</label><select class="es" id="tpuk" style="font-size:13.2px" onchange="onPukChange(this)"></select></div>
           <div class="tdisp" id="tdisp">00:00:00</div>
           <div class="tact">
             <button class="tbm ts" id="tmb" onclick="toggleTimer()">▶ Start</button>
@@ -411,6 +431,7 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
           </div>
           <div class="mf" id="mf">
             <label class="tlbl">Task</label><select class="es" id="mft" style="font-size:13.2px"></select>
+            <label class="tlbl">PUK</label><select class="es" id="mfpuk" style="font-size:13.2px" onchange="onPukChange(this)"></select>
             <label class="tlbl">Duration (minutes)</label><input class="ei" id="mfm" type="number" min="1" placeholder="e.g. 45">
             <label class="tlbl">Note (optional)</label><input class="ei" id="mfn" type="text" placeholder="What did you work on?">
             <div class="mfr"><button class="btn accent" onclick="saveMf()" style="flex:1">Add entry</button><button class="btn" onclick="toggleMf()" style="flex:1">Cancel</button></div>
@@ -433,6 +454,20 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
 </div>
 </div>
 
+<!-- Budget modal -->
+<div class="modal-ov" id="budget-ov" style="display:none" onclick="closeBudgetEditor()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <span class="modal-htitle">Budget Allocation</span>
+      <button class="modal-close" type="button" onclick="closeBudgetEditor()">×</button>
+    </div>
+    <div id="budget-editor-content"></div>
+    <div class="modal-foot">
+      <button class="btn" type="button" onclick="closeBudgetEditor()">Cancel</button>
+      <button class="btn accent" type="button" onclick="saveBudgetEditor()">Save budgets</button>
+    </div>
+  </div>
+</div>
 <div class="dov" id="dov" onclick="closeDD()"></div>
 <div class="dd" id="dd">
   <button class="ddbp" onclick="setSt('Pending')">Pending</button>
@@ -473,7 +508,7 @@ async function cloudPull(){
     const[aRes,lRes]=await Promise.all([sb.from('actions').select('*').order('id'),sb.from('time_logs').select('*').order('id',{ascending:false})]);
     if(aRes.error)throw aRes.error;if(lRes.error)throw lRes.error;
     const rs=aRes.data.map(r=>({id:r.id,action:r.action,who:r.who||'',status:r.status||'Pending',priority:r.priority||'Medium',theme:r.theme||'General',start:r.start_date||'',due:r.due_date||'',est:r.est||0,comments:r.comments||[]}));
-    const ls=lRes.data.map(l=>({id:l.id,tid:l.tid,dur:l.dur||0,note:l.note||'',ts:l.ts||new Date().toISOString()}));
+    const ls=lRes.data.map(l=>({id:l.id,tid:l.tid,dur:l.dur||0,note:l.note||'',puk:l.puk||'',ts:l.ts||new Date().toISOString()}));
     setSyncStatus('idle');
     return{rows:rs,logs:ls};
   }catch(e){console.error('cloudPull failed',e);setSyncStatus('error');return null;}
@@ -483,7 +518,7 @@ async function cloudPush(){
   syncing=true;setSyncStatus('syncing');
   try{
     const acts=rows.map(r=>({id:r.id,action:r.action,who:r.who||'',status:r.status,priority:r.priority||'Medium',theme:r.theme||'General',start_date:r.start||'',due_date:r.due||'',est:r.est||0,comments:r.comments||[]}));
-    const tls=logs.map(l=>({id:l.id,tid:l.tid,dur:l.dur||0,note:l.note||'',ts:l.ts||''}));
+    const tls=logs.map(l=>({id:l.id,tid:l.tid,dur:l.dur||0,note:l.note||'',puk:l.puk||'',ts:l.ts||''}));
     const[ea,eal]=await Promise.all([sb.from('actions').select('id'),sb.from('time_logs').select('id')]);
     const remoteActIds=new Set((ea.data||[]).map(r=>r.id));
     const remoteLogIds=new Set((eal.data||[]).map(r=>r.id));
@@ -521,6 +556,35 @@ function saveThemes(){localStorage.setItem('pt4_themes',JSON.stringify(THEMES.fi
 function loadThemes(){try{const saved=JSON.parse(localStorage.getItem('pt4_themes')||'[]');saved.forEach(t=>{if(!THEMES.includes(t)){THEMES.push(t);}});}catch(e){}}
 function addTheme(){const name=(prompt('New theme name:','')|| '').trim();if(!name)return;if(THEMES.includes(name)){toast('Theme already exists');return;}THEMES.push(name);saveThemes();renderAll();toast('Theme "'+name+'" added');}
 
+let PUKS=['SLF Methane','GMG Methane','PhD Methane'];
+function savePuks(){localStorage.setItem('pt4_puks',JSON.stringify(PUKS.filter(p=>!['SLF Methane','GMG Methane','PhD Methane'].includes(p))));}
+function loadPuks(){try{const saved=JSON.parse(localStorage.getItem('pt4_puks')||'[]');saved.forEach(p=>{if(!PUKS.includes(p))PUKS.push(p);});}catch(e){}}
+function popPukSels(){const opts=PUKS.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('')+'<option value="__add__">＋ Add new PUK…</option>';const a=document.getElementById('tpuk'),b=document.getElementById('mfpuk');if(a)a.innerHTML=opts;if(b)b.innerHTML=opts;}
+function onPukChange(sel){if(sel.value!=='__add__')return;const name=(prompt('New PUK name:','')||'').trim();if(!name){sel.value=PUKS[0]||'';return;}if(!PUKS.includes(name)){PUKS.push(name);savePuks();}popPukSels();sel.value=name;const other=document.getElementById(sel.id==='tpuk'?'mfpuk':'tpuk');if(other)other.value=name;}
+
+let BUDGETS={puks:{},persons:{}};
+function saveBudgets(){localStorage.setItem('pt4_budgets',JSON.stringify(BUDGETS));}
+function loadBudgets(){try{const s=JSON.parse(localStorage.getItem('pt4_budgets')||'{}');BUDGETS={puks:{},persons:{},...s};}catch(e){}}
+function logsYTD(){const start=new Date(new Date().getFullYear(),0,1);return logs.filter(l=>new Date(l.ts)>=start);}
+let _bPuks=[],_bPersons=[];
+function openBudgetEditor(){
+  _bPuks=[...PUKS];
+  _bPersons=[...new Set(rows.flatMap(r=>(r.who||'').split(/\s*[\/,]\s*/).filter(Boolean).map(p=>p.trim())))].filter(Boolean).sort();
+  let h=`<div class="modal-sec-label">PUK — hours per year</div><table class="bdg-tbl"><tr><th>PUK</th><th>Hours / year</th></tr>`;
+  _bPuks.forEach((p,i)=>{h+=`<tr><td>${esc(p)}</td><td><input class="ei sm" type="number" min="0" step="10" id="bpuk-${i}" value="${BUDGETS.puks[p]||''}" placeholder="—" style="width:80px;text-align:right"></td></tr>`;});
+  h+=`</table><div class="modal-sec-label">Person — hours per year</div><table class="bdg-tbl"><tr><th>Person</th><th>Hours / year</th></tr>`;
+  _bPersons.forEach((p,i)=>{h+=`<tr><td>${esc(p)}</td><td><input class="ei sm" type="number" min="0" step="10" id="bper-${i}" value="${BUDGETS.persons[p]||''}" placeholder="—" style="width:80px;text-align:right"></td></tr>`;});
+  h+=`</table>`;
+  document.getElementById('budget-editor-content').innerHTML=h;
+  document.getElementById('budget-ov').style.display='flex';
+}
+function closeBudgetEditor(){document.getElementById('budget-ov').style.display='none';}
+function saveBudgetEditor(){
+  _bPuks.forEach((p,i)=>{const v=parseFloat(document.getElementById('bpuk-'+i)?.value);if(v>0)BUDGETS.puks[p]=v;else delete BUDGETS.puks[p];});
+  _bPersons.forEach((p,i)=>{const v=parseFloat(document.getElementById('bper-'+i)?.value);if(v>0)BUDGETS.persons[p]=v;else delete BUDGETS.persons[p];});
+  saveBudgets();closeBudgetEditor();renderReports();toast('Budgets saved');
+}
+
 const today=new Date();today.setHours(0,0,0,0);
 function ds(n){const d=new Date(today);d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];}
 
@@ -557,6 +621,8 @@ function loadLocal(){
     ncid=+(localStorage.getItem('pt4_ncid')||200);
   }catch(e){rows=DEF.map(x=>({...x,comments:[]}));}
   loadThemes();
+  loadPuks();
+  loadBudgets();
 }
 function loadTimerState(){
   const t=localStorage.getItem('pt4_t');
@@ -608,7 +674,7 @@ function ago(iso){const diff=Math.floor((new Date()-new Date(iso))/60000);if(dif
 function panelThemePills(activeFilt,fn){
   const all=`<button class="theme-pill-all${activeFilt==='all'?' active':''}" onclick="${fn}('all')">All themes</button>`;
   const sep=`<span class="tf-sep"></span>`;
-  const pills=THEMES.map(t=>{const m=thm(t);const a=activeFilt===t;return`<button class="theme-pill${a?' active':''}" style="${a?`background:${m.bg};border-color:${m.dot};color:${m.text}`:''}" onclick="${fn}('${t}')"><span class="tp-dot" style="background:${m.dot}"></span>${t}</button>`;}).join('');
+  const pills=THEMES.map(t=>{const m=thm(t);const a=activeFilt===t;return`<button class="theme-pill${a?' active':''}" onclick="${fn}('${t}')"><span class="tp-dot" style="background:${m.dot}"></span>${t}</button>`;}).join('');
   const addBtn=`<button class="theme-pill-add" onclick="addTheme()" title="Add new theme">＋ Add theme</button>`;
   return`<div class="theme-filter-row" style="margin-bottom:14px">${all}${sep}${pills}${sep}${addBtn}</div>`;
 }
@@ -671,12 +737,13 @@ function renderOverview(){
 
   // theme cards
   const grid=document.getElementById('ov-grid');
+  const addCard=`<div class="ov-card-add" onclick="addTheme()"><div class="ov-card-add-icon">+</div><div class="ov-card-add-label">Add theme</div></div>`;
   grid.innerHTML=THEMES.map(theme=>{
     const m=thm(theme);
     const tr=rows.filter(r=>r.theme===theme);
     if(tr.length===0) return`<div class="ov-card empty-theme" onclick="drillTheme('${theme}')">
-      <div class="ov-card-accent" style="background:${m.bg}"></div>
-      <div class="ov-card-head"><span class="ov-card-dot" style="background:${m.dot}"></span><span class="ov-card-name">${theme}</span></div>
+      <div class="ov-card-accent"></div>
+      <div class="ov-card-head"><span class="ov-card-dot"></span><span class="ov-card-name">${theme}</span></div>
       <div style="font-size:12.1px;color:var(--text3);font-style:italic">No tasks yet</div>
     </div>`;
     const counts={pending:0,asap:0,ongoing:0,done:0};
@@ -697,9 +764,9 @@ function renderOverview(){
       {k:'done',l:'Done',bg:'var(--done-bg)',c:'var(--done-text)'},
     ].filter(s=>counts[s.k]>0).map(s=>`<span class="ov-status-chip" style="background:${s.bg};color:${s.c}">${counts[s.k]} ${s.l}</span>`).join('');
     return`<div class="ov-card" onclick="drillTheme('${theme}')">
-      <div class="ov-card-accent" style="background:${m.bg}"></div>
+      <div class="ov-card-accent"></div>
       <div class="ov-card-head">
-        <span class="ov-card-dot" style="background:${m.dot}"></span>
+        <span class="ov-card-dot"></span>
         <span class="ov-card-name">${theme}</span>
         ${ov>0?`<span class="ov-overdue-badge">⚠ ${ov} overdue</span>`:''}
       </div>
@@ -711,7 +778,7 @@ function renderOverview(){
       </div>
       <div class="ov-status-row">${statusChips}</div>
     </div>`;
-  }).join('');
+  }).join('')+addCard;
 }
 
 function drillTheme(theme){
@@ -736,7 +803,7 @@ function renderThemeFilter(){
     const cnt=rows.filter(r=>r.theme===t).length;
     const m=thm(t);
     const active=thFilt===t;
-    return`<button class="theme-pill${active?' active':''}" style="${active?`background:${m.bg};border-color:${m.dot};color:${m.text}`:''}" onclick="setThFilt('${t}')"><span class="tp-dot" style="background:${m.dot}"></span>${t} <span style="opacity:.6">${cnt}</span></button>`;
+    return`<button class="theme-pill${active?' active':''}" onclick="setThFilt('${t}')"><span class="tp-dot" style="background:${m.dot}"></span>${t} <span style="opacity:.6">${cnt}</span></button>`;
   }).join('');
   const grpBtn=`<button class="group-toggle${grouped?' on':''}" onclick="toggleGroupMode()">${grouped?'Ungroup':'Group by theme'}</button>`;
   const addBtn=`<button class="theme-pill-add" onclick="addTheme()" title="Add new theme">＋ Add theme</button>`;
@@ -970,10 +1037,10 @@ function popSels(){const filtRows=tlogThFilt==='all'?rows:rows.filter(r=>r.theme
 function startTFor(id){if(tiv)stopT();ttid=id;showTab('timelog',document.querySelectorAll('.tab')[3]);document.getElementById('tts').value=id;startTUI();}
 function toggleTimer(){if(tiv)stopT();else{ttid=parseInt(document.getElementById('tts').value);tel=0;tstart=new Date();startTUI();}}
 function startTUI(){tstart=tstart||new Date();updT();tiv=setInterval(updT,1000);document.getElementById('tmb').textContent='⏹ Stop';document.getElementById('tmb').className='tbm tp';document.getElementById('tdisp').classList.add('running');if(ttid)document.getElementById('tts').value=ttid;localStorage.setItem('pt4_t',JSON.stringify({r:true,tid:ttid,s:tstart.toISOString(),e:tel}));renderTable();}
-function stopT(){if(!tiv)return;clearInterval(tiv);tiv=null;const el2=tel+Math.floor((new Date()-tstart)/1000),mins=Math.max(1,Math.round(el2/60));const tid=ttid||parseInt(document.getElementById('tts').value);logs.unshift({id:nlid++,tid,dur:mins,note:'Timer session',ts:new Date().toISOString()});tstart=null;tel=0;ttid=null;localStorage.removeItem('pt4_t');document.getElementById('tdisp').textContent='00:00:00';document.getElementById('tdisp').classList.remove('running');document.getElementById('tmb').textContent='▶ Start';document.getElementById('tmb').className='tbm ts';renderTL();renderTable();scheduleSync();toast('Logged '+fh(mins));}
+function stopT(){if(!tiv)return;clearInterval(tiv);tiv=null;const el2=tel+Math.floor((new Date()-tstart)/1000),mins=Math.max(1,Math.round(el2/60));const tid=ttid||parseInt(document.getElementById('tts').value);logs.unshift({id:nlid++,tid,dur:mins,note:'Timer session',puk:document.getElementById('tpuk')?.value||'',ts:new Date().toISOString()});tstart=null;tel=0;ttid=null;localStorage.removeItem('pt4_t');document.getElementById('tdisp').textContent='00:00:00';document.getElementById('tdisp').classList.remove('running');document.getElementById('tmb').textContent='▶ Start';document.getElementById('tmb').className='tbm ts';renderTL();renderTable();scheduleSync();toast('Logged '+fh(mins));}
 function updT(){const e=tel+Math.floor((new Date()-tstart)/1000);const h=Math.floor(e/3600),m=Math.floor((e%3600)/60),s=e%60;document.getElementById('tdisp').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
 function toggleMf(){document.getElementById('mf').classList.toggle('open');}
-function saveMf(){const tid=parseInt(document.getElementById('mft').value),mins=parseInt(document.getElementById('mfm').value),note=document.getElementById('mfn').value.trim()||'Manual entry';if(!tid||!mins||mins<1){toast('Enter task and duration');return;}logs.unshift({id:nlid++,tid,dur:mins,note,ts:new Date().toISOString()});document.getElementById('mfm').value='';document.getElementById('mfn').value='';document.getElementById('mf').classList.remove('open');renderTL();renderTable();scheduleSync();toast('Added '+fh(mins));}
+function saveMf(){const tid=parseInt(document.getElementById('mft').value),mins=parseInt(document.getElementById('mfm').value),note=document.getElementById('mfn').value.trim()||'Manual entry',puk=document.getElementById('mfpuk')?.value||'';if(!tid||!mins||mins<1){toast('Enter task and duration');return;}logs.unshift({id:nlid++,tid,dur:mins,note,puk,ts:new Date().toISOString()});document.getElementById('mfm').value='';document.getElementById('mfn').value='';document.getElementById('mf').classList.remove('open');renderTL();renderTable();scheduleSync();toast('Added '+fh(mins));}
 function delLog(id){logs=logs.filter(l=>l.id!==id);renderTL();renderTable();scheduleSync();}
 
 // ────────── TIME LOG + REPORTS ──────────
@@ -1045,11 +1112,26 @@ function renderReports(){
       ${sortedTheme.map(([t,m])=>{
         const mc=thm(t);
         return`<div class="rpt-bar-row">
-          <div class="rpt-bar-label" style="color:${mc.text}">${t}</div>
+          <div class="rpt-bar-label">${t}</div>
           <div class="rpt-bar-wrap"><div class="rpt-bar-fill" style="width:${Math.round(m/maxTheme*100)}%;background:${mc.dot}"></div></div>
           <div class="rpt-bar-val">${fh(m)}</div>
         </div>`;
       }).join('')}
+    </div>`;
+  }
+
+  // By PUK
+  const byPuk={};
+  pl.forEach(l=>{if(l.puk){byPuk[l.puk]=(byPuk[l.puk]||0)+(l.dur||0);}});
+  const sortedPuk=Object.entries(byPuk).sort((a,b)=>b[1]-a[1]);
+  const maxPuk=sortedPuk[0]?sortedPuk[0][1]:1;
+  if(sortedPuk.length>0){
+    html+=`<div class="rpt-section"><div class="rpt-title">By PUK</div>
+      ${sortedPuk.map(([p,m])=>`<div class="rpt-bar-row">
+        <div class="rpt-bar-label">${esc(p)}</div>
+        <div class="rpt-bar-wrap"><div class="rpt-bar-fill" style="width:${Math.round(m/maxPuk*100)}%;background:var(--accent)"></div></div>
+        <div class="rpt-bar-val">${fh(m)}</div>
+      </div>`).join('')}
     </div>`;
   }
 
@@ -1089,13 +1171,46 @@ function renderReports(){
 
   if(pl.length===0){html+=`<div class="rpt-section"><div class="rpt-empty">No time logged for this period.</div></div>`;}
 
+  // Budget — always year-to-date, independent of period filter
+  {
+    const ytd=logsYTD();
+    const hasPB=Object.values(BUDGETS.puks).some(v=>v>0);
+    const hasPerB=Object.values(BUDGETS.persons).some(v=>v>0);
+    const ytdByPuk={};
+    ytd.forEach(l=>{if(l.puk)ytdByPuk[l.puk]=(ytdByPuk[l.puk]||0)+(l.dur||0);});
+    const ytdByPerson={};
+    ytd.forEach(l=>{const r=rows.find(x=>x.id===l.tid);const people=(r?.who||'').split(/\s*[\/,]\s*/).filter(Boolean);people.forEach(p=>{const pn=p.trim();if(pn)ytdByPerson[pn]=(ytdByPerson[pn]||0)+(l.dur||0)/people.length;});});
+    const bdgSection=(data,ytdMap)=>Object.entries(data).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([name,budgetH])=>{
+      const budgetMins=budgetH*60,loggedMins=Math.round(ytdMap[name]||0);
+      const pct=budgetMins>0?Math.min(Math.round(loggedMins/budgetMins*100),100):0;
+      const over=loggedMins>budgetMins,warn=!over&&loggedMins/budgetMins>=0.8;
+      const fc=over?'var(--asap-dot)':warn?'var(--pending-dot)':'var(--done-dot)';
+      const badge=over?`<span style="font-size:9.5px;font-weight:700;color:var(--asap-text);background:var(--asap-bg);padding:1px 6px;border-radius:99px;margin-left:5px;vertical-align:middle">OVER</span>`:warn?`<span style="font-size:9.5px;font-weight:600;color:var(--pending-text);background:var(--pending-bg);padding:1px 6px;border-radius:99px;margin-left:5px;vertical-align:middle">${pct}%</span>`:'';
+      return`<div class="rpt-bar-row">
+        <div class="rpt-bar-label" style="max-width:130px">${esc(name)}${badge}</div>
+        <div class="rpt-bar-wrap"><div class="rpt-bar-fill" style="width:${pct}%;background:${fc}"></div></div>
+        <div class="rpt-bar-val" style="min-width:88px;font-size:11px;white-space:nowrap">${fh(loggedMins)} / ${budgetH}h</div>
+      </div>`;
+    }).join('');
+    html+=`<div class="rpt-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${hasPB||hasPerB?14:0}px">
+        <div class="rpt-title" style="margin-bottom:0">Budget — year to date</div>
+        <button class="btn sm" type="button" onclick="openBudgetEditor()">Edit</button>
+      </div>
+      ${hasPB||hasPerB
+        ? (hasPB?`<div style="font-size:11px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">PUK</div>${bdgSection(BUDGETS.puks,ytdByPuk)}`:'')
+          +(hasPerB?`<div style="font-size:11px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin:${hasPB?'12px':0} 0 8px">Person</div>${bdgSection(BUDGETS.persons,ytdByPerson)}`:'')
+        : `<div class="rpt-empty">No allocations set — click Edit to configure.</div>`}
+    </div>`;
+  }
+
   html+=`<button class="export-btn" onclick="exportTimeReport()">Export time report CSV</button>`;
   el.innerHTML=html;
 }
 
 function exportTimeReport(){
   const pl=logsInPeriod();
-  const hdr='Date,Time,Task,Theme,Who,Duration (min),Duration (h),Note\n';
+  const hdr='Date,Time,Task,Theme,Who,PUK,Duration (min),Duration (h),Note\n';
   const body=pl.map(l=>{
     const r=rows.find(x=>x.id===l.tid);
     const d=new Date(l.ts);
@@ -1105,6 +1220,7 @@ function exportTimeReport(){
       `"${(r?.action||'Task #'+l.tid).replace(/"/g,'""')}"`,
       r?.theme||'General',
       `"${(r?.who||'').replace(/"/g,'""')}"`,
+      `"${(l.puk||'').replace(/"/g,'""')}"`,
       l.dur||0,
       ((l.dur||0)/60).toFixed(2),
       `"${(l.note||'').replace(/"/g,'""')}"`
@@ -1114,17 +1230,17 @@ function exportTimeReport(){
 }
 
 function renderTL(){
-  popSels();
+  popSels();popPukSels();
   const tf=document.getElementById('tlog-theme-filter');if(tf)tf.innerHTML=panelThemePills(tlogThFilt,'setTlogThFilt');
   const filtLogs=tlogThFilt==='all'?logs:logs.filter(l=>{const r=rows.find(x=>x.id===l.tid);return r&&r.theme===tlogThFilt;});
   const ll=document.getElementById('lgl');
-  ll.innerHTML=filtLogs.length===0?`<div style="color:var(--text3);font-size:13.2px;padding:16px 0">No time logged for this theme.</div>`:filtLogs.slice(0,40).map(l=>{const r=rows.find(x=>x.id===l.tid);const ts=new Date(l.ts).toLocaleDateString('sv-SE')+' '+new Date(l.ts).toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});return`<div class="li"><span class="lid" style="background:${r?dc(r.status):'var(--text3)'}"></span><div class="lib"><div class="lit">${esc(r?r.action.substring(0,60):'Task #'+l.tid)}</div><div class="lim">${l.note} · ${ts}</div></div><span class="lidr">${fh(l.dur)}</span><button class="lidl" onclick="delLog(${l.id})">×</button></div>`;}).join('');
+  ll.innerHTML=filtLogs.length===0?`<div style="color:var(--text3);font-size:13.2px;padding:16px 0">No time logged for this theme.</div>`:filtLogs.slice(0,40).map(l=>{const r=rows.find(x=>x.id===l.tid);const ts=new Date(l.ts).toLocaleDateString('sv-SE')+' '+new Date(l.ts).toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});return`<div class="li"><span class="lid" style="background:${r?dc(r.status):'var(--text3)'}"></span><div class="lib"><div class="lit">${esc(r?r.action.substring(0,60):'Task #'+l.tid)}</div><div class="lim">${l.note}${l.puk?` · <span style="font-weight:500">${esc(l.puk)}</span>`:''} · ${ts}</div></div><span class="lidr">${fh(l.dur)}</span><button class="lidl" onclick="delLog(${l.id})">×</button></div>`;}).join('');
   renderReports();
 }
 
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
 
-function renderAll(){renderTable();renderOverview();popSels();}
+function renderAll(){renderTable();renderOverview();popSels();popPukSels();}
 
 // wrap scheduleSync to also keep localStorage fresh
 const _origScheduleSync=scheduleSync;
@@ -1138,7 +1254,7 @@ scheduleSync=function(){
 };
 
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeDD();cancelE();}
+  if(e.key==='Escape'){closeDD();cancelE();closeBudgetEditor();}
   if(e.key==='Enter'&&eid&&!e.target.matches('select,textarea'))saveE(eid);
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveAll();}
 });
