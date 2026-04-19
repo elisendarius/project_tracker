@@ -57,6 +57,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .topbar .proj-name{color:rgba(255,255,255,.75)}
 .topbar .proj-name::placeholder{color:rgba(255,255,255,.35)}
 .topbar #sync-status{color:rgba(255,255,255,.45)!important}
+.topbar .proj-name:focus{color:var(--text);background:var(--surface)}
 .content{flex:1;padding:24px 28px 60px;max-width:1392px;width:100%;margin:0 auto}
 .panel{display:none}.panel.active{display:block}
 
@@ -377,7 +378,7 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
         <colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"><col class="c5"><col class="c6"><col class="c7"><col class="c8"><col class="c9"></colgroup>
         <thead><tr>
           <th>Action</th><th>Responsible</th><th>Start → Due</th><th>Status</th><th>Priority</th><th>Theme</th><th>Logged</th><th>Comments</th>
-          <th style="text-align:right"><div class="sw"><svg class="sico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="si" placeholder="Search…" oninput="onSearch(this.value)"></div></th>
+          <th style="text-align:right"><div class="sw"><svg class="sico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="si" placeholder="" oninput="onSearch(this.value)"></div></th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
