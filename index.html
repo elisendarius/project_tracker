@@ -79,6 +79,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .theme-pill-all:hover{border-color:var(--border2);color:var(--text)}
 .theme-pill-all.active{background:var(--surface2);border-color:var(--border3);color:var(--text);font-weight:500}
 .tf-sep{width:1px;height:18px;background:var(--border2);margin:0 2px;flex-shrink:0}
+.theme-pill-add{font-family:var(--font-body);font-size:12.1px;padding:4px 11px;border-radius:99px;border:1px dashed var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap}
+.theme-pill-add:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
 .group-toggle{margin-left:auto;font-family:var(--font-body);font-size:12.1px;padding:4px 12px;border-radius:var(--r);border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap}
 .group-toggle:hover{border-color:var(--border3);color:var(--text)}
 .group-toggle.on{background:var(--accent-bg);color:var(--accent);border-color:var(--accent2)}
@@ -390,11 +392,13 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
   <!-- ── TIMELINE ── -->
   <div class="panel" id="panel-timeline">
     <div class="tlh"><h2>Timeline</h2><div class="tln"><button class="active" onclick="setTl(3,this)">3 mo</button><button onclick="setTl(6,this)">6 mo</button><button onclick="setTl(12,this)">12 mo</button></div></div>
+    <div id="tl-theme-filter"></div>
     <div class="gw" id="gw"></div>
   </div>
 
   <!-- ── TIME LOG ── -->
   <div class="panel" id="panel-timelog">
+    <div id="tlog-theme-filter"></div>
     <div class="tll">
       <div>
         <h3>Timer</h3>
@@ -503,7 +507,7 @@ function scheduleSync(){
 // ============ END SUPABASE ============
 
 // ============ THEME SYSTEM ============
-const THEMES = ['Data','Equipment','Communication','Analysis','Admin','General'];
+let THEMES = ['Data','Equipment','Communication','Analysis','Admin','General'];
 const TM = {
   'Data':          {bg:'#1B3A6B',text:'#EFF6FF',muted:'rgba(239,246,255,.55)',dot:'#93C5FD'},
   'Equipment':     {bg:'#1D4ED8',text:'#EFF6FF',muted:'rgba(239,246,255,.55)',dot:'#BFDBFE'},
@@ -512,7 +516,10 @@ const TM = {
   'Admin':         {bg:'#BFDBFE',text:'#1E3A8A',muted:'#3B82F6',dot:'#1D4ED8'},
   'General':       {bg:'#DBEAFE',text:'#1E3A8A',muted:'#3B82F6',dot:'#2563EB'},
 };
-function thm(t){return TM[t]||TM['General'];}
+function thm(t){return TM[t]||{bg:'#DBEAFE',text:'#1E3A8A',muted:'#3B82F6',dot:'#2563EB'};}
+function saveThemes(){localStorage.setItem('pt4_themes',JSON.stringify(THEMES.filter(t=>!['Data','Equipment','Communication','Analysis','Admin','General'].includes(t))));}
+function loadThemes(){try{const saved=JSON.parse(localStorage.getItem('pt4_themes')||'[]');saved.forEach(t=>{if(!THEMES.includes(t)){THEMES.push(t);}});}catch(e){}}
+function addTheme(){const name=(prompt('New theme name:','')|| '').trim();if(!name)return;if(THEMES.includes(name)){toast('Theme already exists');return;}THEMES.push(name);saveThemes();renderAll();toast('Theme "'+name+'" added');}
 
 const today=new Date();today.setHours(0,0,0,0);
 function ds(n){const d=new Date(today);d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];}
@@ -534,6 +541,7 @@ const DEF=[
 
 let rows=[],logs=[],nid=20,nlid=100,ncid=200;
 let filt='all',sq='',thFilt='all',grouped=false,collapsedGroups=new Set();
+let tlThFilt='all',tlogThFilt='all';
 let eid=null,ddid=null,ddpid=null,ddtid=null,ocid=null,tlm=3;
 let tiv=null,tstart=null,ttid=null,tel=0,lastA='';
 let rptPeriod='week';
@@ -548,6 +556,7 @@ function loadLocal(){
     nlid=+(localStorage.getItem('pt4_nlid')||100);
     ncid=+(localStorage.getItem('pt4_ncid')||200);
   }catch(e){rows=DEF.map(x=>({...x,comments:[]}));}
+  loadThemes();
 }
 function loadTimerState(){
   const t=localStorage.getItem('pt4_t');
@@ -595,6 +604,16 @@ function lm(id){return logs.filter(l=>l.tid===id).reduce((a,l)=>a+(l.dur||0),0);
 function tlmTotal(){return logs.reduce((a,l)=>a+(l.dur||0),0);}
 function initials(n){return(n||'?').split(/[\s\/]+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');}
 function ago(iso){const diff=Math.floor((new Date()-new Date(iso))/60000);if(diff<1)return'just now';if(diff<60)return diff+'m ago';const h=Math.floor(diff/60);if(h<24)return h+'h ago';const d=Math.floor(h/24);return d<7?d+'d ago':new Date(iso).toLocaleDateString('sv-SE');}
+
+function panelThemePills(activeFilt,fn){
+  const all=`<button class="theme-pill-all${activeFilt==='all'?' active':''}" onclick="${fn}('all')">All themes</button>`;
+  const sep=`<span class="tf-sep"></span>`;
+  const pills=THEMES.map(t=>{const m=thm(t);const a=activeFilt===t;return`<button class="theme-pill${a?' active':''}" style="${a?`background:${m.bg};border-color:${m.dot};color:${m.text}`:''}" onclick="${fn}('${t}')"><span class="tp-dot" style="background:${m.dot}"></span>${t}</button>`;}).join('');
+  const addBtn=`<button class="theme-pill-add" onclick="addTheme()" title="Add new theme">＋ Add theme</button>`;
+  return`<div class="theme-filter-row" style="margin-bottom:14px">${all}${sep}${pills}${sep}${addBtn}</div>`;
+}
+function setTlThFilt(t){tlThFilt=t;renderG();}
+function setTlogThFilt(t){tlogThFilt=t;renderTL();}
 
 function showTab(n,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -720,7 +739,8 @@ function renderThemeFilter(){
     return`<button class="theme-pill${active?' active':''}" style="${active?`background:${m.bg};border-color:${m.dot};color:${m.text}`:''}" onclick="setThFilt('${t}')"><span class="tp-dot" style="background:${m.dot}"></span>${t} <span style="opacity:.6">${cnt}</span></button>`;
   }).join('');
   const grpBtn=`<button class="group-toggle${grouped?' on':''}" onclick="toggleGroupMode()">${grouped?'Ungroup':'Group by theme'}</button>`;
-  row.innerHTML=allBtn+sep+pills+grpBtn;
+  const addBtn=`<button class="theme-pill-add" onclick="addTheme()" title="Add new theme">＋ Add theme</button>`;
+  row.innerHTML=allBtn+sep+pills+sep+addBtn+grpBtn;
 }
 
 function rv(r){
@@ -924,6 +944,7 @@ function exportCSV(){
 function gIfActive(){if(document.getElementById('panel-timeline').classList.contains('active'))renderG();}
 function setTl(m,btn){tlm=m;document.querySelectorAll('.tln button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderG();}
 function renderG(){
+  const tf=document.getElementById('tl-theme-filter');if(tf)tf.innerHTML=panelThemePills(tlThFilt,'setTlThFilt');
   const wrap=document.getElementById('gw');
   const vs=new Date(today);vs.setDate(vs.getDate()-7);
   const ve=new Date(vs);ve.setMonth(ve.getMonth()+tlm);
@@ -932,7 +953,7 @@ function renderG(){
   while(cur<ve){const ms=new Date(Math.max(cur,vs)),me=new Date(Math.min(new Date(cur.getFullYear(),cur.getMonth()+1,1),ve));months.push({l:cur.toLocaleDateString('en-SE',{month:'short',year:'2-digit'}),p:((me-ms)/86400000/tot*100).toFixed(3)});cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);}
   const toff=((today-vs)/86400000/tot*100).toFixed(3);
   let html=`<div class="gh"><div class="glc">Task</div><div class="gtc"><div class="gms">${months.map(m=>`<div class="gm" style="width:${m.p}%">${m.l}</div>`).join('')}</div><div class="gtl" style="left:${toff}%"><div class="gtll" style="left:50%">today</div></div></div></div>`;
-  const vis=rows.filter(r=>filt==='all'||sk(r.status)===filt);
+  const vis=rows.filter(r=>(filt==='all'||sk(r.status)===filt)&&(tlThFilt==='all'||r.theme===tlThFilt));
   if(!vis.length){html+=`<div class="ge">No tasks to display.</div>`;wrap.innerHTML=html;return;}
   vis.forEach(r=>{
     const s=pd(r.start),e=pd(r.due);let bar='';
@@ -945,7 +966,7 @@ function showTip(e,el){const t=document.getElementById('gtip');t.textContent=el.
 function hideTip(){document.getElementById('gtip').style.display='none';}
 
 // ────────── TIMER ──────────
-function popSels(){const o=rows.map(r=>`<option value="${r.id}">${r.action.substring(0,55)}${r.action.length>55?'…':''}</option>`).join('');document.getElementById('tts').innerHTML=o;document.getElementById('mft').innerHTML=o;}
+function popSels(){const filtRows=tlogThFilt==='all'?rows:rows.filter(r=>r.theme===tlogThFilt);const o=filtRows.map(r=>`<option value="${r.id}">${r.action.substring(0,55)}${r.action.length>55?'…':''}</option>`).join('');const empty='<option value="">No tasks in this theme</option>';document.getElementById('tts').innerHTML=o||empty;document.getElementById('mft').innerHTML=o||empty;}
 function startTFor(id){if(tiv)stopT();ttid=id;showTab('timelog',document.querySelectorAll('.tab')[3]);document.getElementById('tts').value=id;startTUI();}
 function toggleTimer(){if(tiv)stopT();else{ttid=parseInt(document.getElementById('tts').value);tel=0;tstart=new Date();startTUI();}}
 function startTUI(){tstart=tstart||new Date();updT();tiv=setInterval(updT,1000);document.getElementById('tmb').textContent='⏹ Stop';document.getElementById('tmb').className='tbm tp';document.getElementById('tdisp').classList.add('running');if(ttid)document.getElementById('tts').value=ttid;localStorage.setItem('pt4_t',JSON.stringify({r:true,tid:ttid,s:tstart.toISOString(),e:tel}));renderTable();}
@@ -960,15 +981,16 @@ function setRptPeriod(p,btn){rptPeriod=p;document.querySelectorAll('.rpt-period 
 
 function logsInPeriod(){
   const now=new Date();
+  let ls=tlogThFilt==='all'?logs:logs.filter(l=>{const r=rows.find(x=>x.id===l.tid);return r&&r.theme===tlogThFilt;});
   if(rptPeriod==='week'){
     const start=new Date(now);start.setDate(start.getDate()-start.getDay()+1);start.setHours(0,0,0,0);
-    return logs.filter(l=>new Date(l.ts)>=start);
+    return ls.filter(l=>new Date(l.ts)>=start);
   }
   if(rptPeriod==='month'){
     const start=new Date(now.getFullYear(),now.getMonth(),1);
-    return logs.filter(l=>new Date(l.ts)>=start);
+    return ls.filter(l=>new Date(l.ts)>=start);
   }
-  return logs;
+  return ls;
 }
 
 function renderReports(){
@@ -1093,8 +1115,10 @@ function exportTimeReport(){
 
 function renderTL(){
   popSels();
+  const tf=document.getElementById('tlog-theme-filter');if(tf)tf.innerHTML=panelThemePills(tlogThFilt,'setTlogThFilt');
+  const filtLogs=tlogThFilt==='all'?logs:logs.filter(l=>{const r=rows.find(x=>x.id===l.tid);return r&&r.theme===tlogThFilt;});
   const ll=document.getElementById('lgl');
-  ll.innerHTML=logs.length===0?`<div style="color:var(--text3);font-size:13.2px;padding:16px 0">No time logged yet.</div>`:logs.slice(0,40).map(l=>{const r=rows.find(x=>x.id===l.tid);const ts=new Date(l.ts).toLocaleDateString('sv-SE')+' '+new Date(l.ts).toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});return`<div class="li"><span class="lid" style="background:${r?dc(r.status):'var(--text3)'}"></span><div class="lib"><div class="lit">${esc(r?r.action.substring(0,60):'Task #'+l.tid)}</div><div class="lim">${l.note} · ${ts}</div></div><span class="lidr">${fh(l.dur)}</span><button class="lidl" onclick="delLog(${l.id})">×</button></div>`;}).join('');
+  ll.innerHTML=filtLogs.length===0?`<div style="color:var(--text3);font-size:13.2px;padding:16px 0">No time logged for this theme.</div>`:filtLogs.slice(0,40).map(l=>{const r=rows.find(x=>x.id===l.tid);const ts=new Date(l.ts).toLocaleDateString('sv-SE')+' '+new Date(l.ts).toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});return`<div class="li"><span class="lid" style="background:${r?dc(r.status):'var(--text3)'}"></span><div class="lib"><div class="lit">${esc(r?r.action.substring(0,60):'Task #'+l.tid)}</div><div class="lim">${l.note} · ${ts}</div></div><span class="lidr">${fh(l.dur)}</span><button class="lidl" onclick="delLog(${l.id})">×</button></div>`;}).join('');
   renderReports();
 }
 
