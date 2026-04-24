@@ -1517,10 +1517,10 @@ async function sendMagicLink(){
   }
 }
 async function signOut(){
-  if(!sb)return;
-  await sb.auth.signOut();
+  stopLiveSync();
   currentUser=null;updateAuthUI();showLogin();
   rows=[];logs=[];renderAll();setSyncStatus('idle');
+  if(sb){try{await sb.auth.signOut();}catch(e){}}
 }
 function updateAuthUI(){
   const chip=document.getElementById('user-chip');
@@ -1531,6 +1531,36 @@ function updateAuthUI(){
     chip.style.display='';logoutBtn.style.display='';
   }else{chip.style.display='none';logoutBtn.style.display='none';}
 }
+// ── live multi-user sync ──
+let _liveTimer=null,_rtChannel=null;
+async function liveRefresh(){
+  if(!cloudOn||!currentUser||syncing)return;
+  const data=await cloudPull();
+  if(data){
+    rows=data.rows;logs=data.logs;
+    nid=Math.max(20,...rows.map(r=>r.id||0))+1;
+    nlid=Math.max(100,...logs.map(l=>l.id||0))+1;
+    renderAll();
+  }
+}
+function startLiveSync(){
+  stopLiveSync();
+  _liveTimer=setInterval(liveRefresh,90000);
+  window.addEventListener('focus',liveRefresh);
+  if(sb&&sb.channel){
+    try{
+      _rtChannel=sb.channel('projtrack-sync')
+        .on('postgres_changes',{event:'*',schema:'public',table:'actions'},()=>{if(!syncing)liveRefresh();})
+        .on('postgres_changes',{event:'*',schema:'public',table:'time_logs'},()=>{if(!syncing)liveRefresh();})
+        .subscribe();
+    }catch(e){}
+  }
+}
+function stopLiveSync(){
+  clearInterval(_liveTimer);_liveTimer=null;
+  window.removeEventListener('focus',liveRefresh);
+  if(_rtChannel){try{sb.removeChannel(_rtChannel);}catch(e){}}_rtChannel=null;
+}
 // ============ END AUTH ============
 
 // boot
@@ -1540,7 +1570,7 @@ if(cloudOn&&sb){
   // onAuthStateChange only reacts to explicit events — not used for initial session check
   sb.auth.onAuthStateChange(async(event,session)=>{
     if(event==='SIGNED_IN'){
-      currentUser=session.user;updateAuthUI();hideLogin();await load();renderAll();
+      currentUser=session.user;updateAuthUI();hideLogin();await load();renderAll();startLiveSync();
     }else if(event==='SIGNED_OUT'){
       currentUser=null;updateAuthUI();showLogin();rows=[];logs=[];renderAll();
     }
@@ -1548,7 +1578,7 @@ if(cloudOn&&sb){
   // Authoritative initial check — if session exists, skip login entirely
   sb.auth.getSession().then(async({data:{session}})=>{
     if(session){
-      currentUser=session.user;updateAuthUI();hideLogin();await load();renderAll();
+      currentUser=session.user;updateAuthUI();hideLogin();await load();renderAll();startLiveSync();
     }else{
       showLogin();
     }
