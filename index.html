@@ -81,23 +81,25 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .tf-sep{width:1px;height:18px;background:var(--border2);margin:0 2px;flex-shrink:0}
 .theme-pill-add{font-family:var(--font-body);font-size:12.1px;padding:4px 11px;border-radius:99px;border:1px dashed var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap}
 .theme-pill-add:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
-.group-toggle{margin-left:auto;font-family:var(--font-body);font-size:12.1px;padding:4px 12px;border-radius:var(--r);border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.grp-section{display:flex;align-items:center;gap:3px;margin-left:auto;flex-shrink:0}
+.grp-by-label{font-size:10.5px;font-weight:600;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;padding-right:5px;flex-shrink:0}
+.group-toggle{font-family:var(--font-body);font-size:12.1px;padding:4px 10px;border-radius:var(--r);border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap}
 .group-toggle:hover{border-color:var(--border3);color:var(--text)}
 .group-toggle.on{background:var(--accent-bg);color:var(--accent);border-color:var(--accent2)}
 
 /* ── table ── */
 .tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
 table{width:100%;border-collapse:collapse;table-layout:fixed}
-col.c1{width:24%}col.c2{width:11%}col.c3{width:13%}col.c4{width:9%}col.c5{width:8%}col.c6{width:9%}col.c7{width:7%}col.c8{width:12%}col.c9{width:7%}
+col.c1{width:22%}col.c2{width:10%}col.c3{width:11%}col.c4{width:9%}col.c5{width:9%}col.c6{width:9%}col.c7{width:8%}col.c8{width:10%}col.c9{width:12%}
 thead tr{border-bottom:1px solid var(--border2)}
-th{font-family:var(--font-body);font-size:11px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);padding:10px 14px;text-align:center;background:var(--surface2)}
+th{font-family:var(--font-body);font-size:11px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);padding:10px 11px;text-align:center;background:var(--surface2)}
 tbody tr.dr{border-bottom:1px solid var(--border);transition:background .1s}
 tbody tr.dr:hover{background:var(--surface2)}
 tbody tr.dr.hidden{display:none}
 tbody tr.dr.editing{background:#F9F0F2}
 tbody tr.cr{border-bottom:1px solid var(--border);display:none}
 tbody tr.cr.open{display:table-row}
-td{padding:11px 14px;vertical-align:middle;text-align:center;color:var(--text);font-size:13.75px}
+td{padding:10px 11px;vertical-align:middle;text-align:center;color:var(--text);font-size:13.75px}
 td:nth-child(1){text-align:left;vertical-align:top}
 td:nth-child(3){text-align:left}
 .tda{word-break:break-word;line-height:1.5}
@@ -144,11 +146,13 @@ tbody tr.grp-hdr:hover{background:var(--surface3)}
 .pr-crit{background:var(--prio-crit-bg);color:var(--prio-crit-text)}.pr-crit::before{content:'▲';color:var(--prio-crit-dot)}
 
 /* ── row actions ── */
-.ra{display:flex;gap:5px;justify-content:flex-end;opacity:0;transition:opacity .15s}
-tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
-.rab{font-family:var(--font-body);font-size:12.1px;padding:3px 8px;border-radius:var(--r);border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all .12s}
+.ra{display:flex;gap:3px;justify-content:flex-end;flex-wrap:nowrap}
+.rab{font-family:var(--font-body);font-size:11px;padding:2px 6px;border-radius:var(--r);border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all .12s;white-space:nowrap}
 .rab:hover{border-color:var(--border2);color:var(--text);background:var(--surface2)}
 .rab.del:hover{background:var(--asap-bg);color:var(--asap-text);border-color:var(--asap-dot)}
+.rab.edit-btn{background:#1e4a8a;color:#fff;border-color:#2563c7;font-weight:600}
+.rab.edit-btn:hover{background:#2563c7;border-color:#3b82f6;color:#fff}
+.rab.grp-sep{margin-left:7px}
 .rab.tb{color:var(--accent);border-color:var(--accent2)}.rab.tb:hover{background:var(--accent-bg)}
 .rab.ts{background:var(--accent-bg);color:var(--accent);border-color:var(--accent2)}
 
@@ -163,7 +167,7 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
 .add-btn:hover{color:var(--text2)}
 .aplus{width:18px;height:18px;border:1.5px dashed var(--border2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14.3px;line-height:1}
 .add-btn:hover .aplus{border-color:var(--border3)}
-.sw{position:relative;max-width:200px;margin-left:auto}
+.sw{position:relative;max-width:120px;margin-left:auto}
 .sico{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
 .si{font-family:var(--font-body);font-size:13.2px;width:100%;padding:5px 10px 5px 26px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);color:var(--text);outline:none;transition:border-color .15s}
 .si:focus{border-color:var(--border2)}.si::placeholder{color:var(--text3)}
@@ -192,6 +196,11 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
 .cti::placeholder{color:var(--text3)}
 .cpb{font-family:var(--font-body);font-size:13.2px;padding:8px 16px;border-radius:var(--r);border:1px solid var(--accent2);background:var(--accent-bg);color:var(--accent);cursor:pointer;transition:all .15s;white-space:nowrap;align-self:flex-end}
 .cpb:hover{background:#dceaf5}
+.cp-head{display:flex;align-items:center;gap:6px;margin-bottom:12px;justify-content:flex-end}
+.cp-exit{font-family:var(--font-body);font-size:12px;padding:3px 10px;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;gap:5px}
+.cp-exit:hover{border-color:var(--border3);background:var(--surface3);color:var(--text)}
+.cp-clr{font-family:var(--font-body);font-size:12px;padding:3px 10px;border-radius:var(--r);border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;gap:5px}
+.cp-clr:hover{color:var(--asap-text);border-color:var(--asap-dot);background:var(--asap-bg)}
 
 /* ── gantt ── */
 .tlh{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
@@ -399,6 +408,26 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
 .act-user{font-weight:600;color:var(--text);flex-shrink:0}
 .act-desc{flex:1}
 .act-time{color:var(--text3);font-size:10.5px;flex-shrink:0;white-space:nowrap}
+/* ── notifications ── */
+.notif-wrap{position:relative;display:none}
+.notif-bell{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.65);font-size:15px;padding:4px 6px;border-radius:var(--r);transition:color .15s;position:relative;line-height:1}
+.notif-bell:hover{color:#fff;background:rgba(255,255,255,.1)}
+.notif-badge{position:absolute;top:-3px;right:-3px;background:var(--asap-dot);color:#fff;font-size:9px;font-weight:700;font-family:var(--font-body);min-width:14px;height:14px;border-radius:99px;display:none;align-items:center;justify-content:center;padding:0 3px;pointer-events:none}
+.notif-panel{position:absolute;top:calc(100% + 8px);right:0;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);box-shadow:0 8px 28px rgba(0,0,0,.18);width:290px;z-index:200;overflow:hidden}
+.notif-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.notif-title{font-size:12.1px;font-weight:600;color:var(--text)}
+.notif-clear{background:none;border:none;font-size:11px;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:var(--r);transition:color .12s}
+.notif-clear:hover{color:var(--asap-text)}
+.notif-list{max-height:280px;overflow-y:auto}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);transition:background .1s}
+.notif-item:last-child{border-bottom:none}
+.notif-item:hover{background:var(--surface2)}
+.notif-body{flex:1;min-width:0}
+.notif-email{font-size:13.2px;font-weight:500;color:var(--text);word-break:break-all}
+.notif-time{font-size:11px;color:var(--text3);margin-top:2px}
+.notif-dismiss{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:0 2px;line-height:1;transition:color .12s;flex-shrink:0;align-self:center}
+.notif-dismiss:hover{color:var(--asap-text)}
+.notif-empty{padding:18px 14px;font-size:13.2px;color:var(--text3);text-align:center;font-style:italic}
 /* ── login ── */
 .login-scrim{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
 .login-scrim.hidden{display:none}
@@ -439,6 +468,9 @@ tbody tr.dr:hover .ra,tbody tr.dr.editing .ra{opacity:1}
   </div>
   <div class="top-actions">
     <span class="user-chip" id="user-chip" style="display:none"><span class="user-chip-email" id="user-chip-email"></span></span>
+    <div class="notif-wrap" id="notif-wrap">
+      <button type="button" class="notif-bell" id="notif-bell" onclick="toggleNotifPanel()">🔔<span class="notif-badge" id="notif-badge">0</span></button>
+    </div>
     <button class="logout-link" id="logout-btn" onclick="signOut()" style="display:none">Log out</button>
     <span id="sync-status" style="font-size:11px;color:rgba(255,255,255,.45);margin-right:6px;font-weight:500"></span>
     <button class="btn" onclick="exportCSV()">Export CSV</button>
@@ -697,7 +729,7 @@ const DEF=[
 ];
 
 let rows=[],logs=[],nid=20,nlid=100,ncid=200;
-let filt='all',sq='',thFilt='all',groupBy='none',collapsedGroups=new Set();
+let filt='all',sq='',thFilt='all',groupBy=[],collapsedGroups=new Set();
 let tlThFilt='all',tlogThFilt='all';
 let eid=null,ddid=null,ddpid=null,ddtid=null,ocid=null,tlm=3;
 let tiv=null,tstart=null,ttid=null,tel=0,lastA='';
@@ -941,7 +973,7 @@ function renderOverview(){
 }
 
 function drillTheme(theme){
-  thFilt=theme;groupBy='none';
+  thFilt=theme;groupBy=[];
   showTab('actions',document.querySelectorAll('.tab')[1]);
   renderThemeFilter();renderTable();
 }
@@ -964,7 +996,8 @@ function renderThemeFilter(){
     const active=thFilt===t;
     return`<button class="theme-pill${active?' active':''}" onclick="setThFilt('${t}')"><span class="tp-dot" style="background:${m.dot}"></span>${t} <span style="opacity:.6">${cnt}</span></button>`;
   }).join('');
-  const grpBtns=`<button class="group-toggle${groupBy==='theme'?' on':''}" onclick="setGroupBy('theme')">Group by theme</button><button class="group-toggle${groupBy==='status'?' on':''}" onclick="setGroupBy('status')">Group by status</button><button class="group-toggle${groupBy==='priority'?' on':''}" onclick="setGroupBy('priority')">Group by priority</button>`;
+  function gbOrd(k){const i=groupBy.indexOf(k);return groupBy.length===2&&i>-1?` <sup style="font-size:9px;font-weight:700;opacity:.75">${i+1}</sup>`:'';}
+  const grpBtns=`<div class="grp-section"><span class="grp-by-label">Group by</span><button type="button" class="group-toggle${groupBy.includes('status')?' on':''}" onclick="setGroupBy('status')">Status${gbOrd('status')}</button><button type="button" class="group-toggle${groupBy.includes('priority')?' on':''}" onclick="setGroupBy('priority')">Priority${gbOrd('priority')}</button><button type="button" class="group-toggle${groupBy.includes('theme')?' on':''}" onclick="setGroupBy('theme')">Theme${gbOrd('theme')}</button></div>`;
   const addBtn=`<button class="theme-pill-add" onclick="addTheme()" title="Add new theme">＋ Add theme</button>`;
   row.innerHTML=allBtn+sep+pills+sep+addBtn+grpBtns;
 }
@@ -994,33 +1027,52 @@ function renderTable(){
   const tb=document.getElementById('tbody');tb.innerHTML='';let vis=0;
   const visRows=rows.filter(r=>rv(r));vis=visRows.length;
 
-  if(groupBy!=='none'){
-    let groups=[];
-    if(groupBy==='theme'){
-      groups=THEMES.map(k=>({key:k,label:k,dot:thm(k).dot,rows:visRows.filter(r=>r.theme===k)})).filter(g=>g.rows.length>0);
-      const other=visRows.filter(r=>!THEMES.includes(r.theme));
-      if(other.length)groups.push({key:'__other__',label:'Other',dot:'var(--text3)',rows:other});
-    }else if(groupBy==='status'){
-      const order=[{k:'asap',l:'ASAP',dot:'var(--asap-dot)'},{k:'pending',l:'Pending',dot:'var(--pending-dot)'},{k:'ongoing',l:'Ongoing',dot:'var(--ongoing-dot)'},{k:'done',l:'Done',dot:'var(--done-dot)'}];
-      groups=order.map(o=>({key:o.k,label:o.l,dot:o.dot,rows:visRows.filter(r=>sk(r.status)===o.k)})).filter(g=>g.rows.length>0);
-    }else if(groupBy==='priority'){
-      const order=[{k:'critical',l:'Critical',dot:'var(--prio-crit-dot)'},{k:'high',l:'High',dot:'var(--prio-high-dot)'},{k:'medium',l:'Medium',dot:'var(--prio-med-dot)'},{k:'low',l:'Low',dot:'var(--prio-low-dot)'}];
-      groups=order.map(o=>({key:o.k,label:o.l,dot:o.dot,rows:visRows.filter(r=>sk(r.priority||'medium')===o.k)})).filter(g=>g.rows.length>0);
+  if(groupBy.length>0){
+    function buildGroups(srcRows,field){
+      if(field==='theme'){
+        const gs=THEMES.map(k=>({key:k,label:k,dot:thm(k).dot,rows:srcRows.filter(r=>r.theme===k)})).filter(g=>g.rows.length>0);
+        const other=srcRows.filter(r=>!THEMES.includes(r.theme));
+        if(other.length)gs.push({key:'__other__',label:'Other',dot:'var(--text3)',rows:other});
+        return gs;
+      }else if(field==='status'){
+        return [{k:'asap',l:'ASAP',dot:'var(--asap-dot)'},{k:'pending',l:'Pending',dot:'var(--pending-dot)'},{k:'ongoing',l:'Ongoing',dot:'var(--ongoing-dot)'},{k:'done',l:'Done',dot:'var(--done-dot)'}]
+          .map(o=>({key:o.k,label:o.l,dot:o.dot,rows:srcRows.filter(r=>sk(r.status)===o.k)})).filter(g=>g.rows.length>0);
+      }else{
+        return [{k:'critical',l:'Critical',dot:'var(--prio-crit-dot)'},{k:'high',l:'High',dot:'var(--prio-high-dot)'},{k:'medium',l:'Medium',dot:'var(--prio-med-dot)'},{k:'low',l:'Low',dot:'var(--prio-low-dot)'}]
+          .map(o=>({key:o.k,label:o.l,dot:o.dot,rows:srcRows.filter(r=>sk(r.priority||'medium')===o.k)})).filter(g=>g.rows.length>0);
+      }
     }
-    groups.forEach(g=>{
-      const collapsed=collapsedGroups.has(g.key);
-      const thTime=g.rows.reduce((a,r)=>a+lm(r.id),0);
+    function makeHdr(key,g,indent){
       const hdr=document.createElement('tr');hdr.className='grp-hdr';
-      hdr.innerHTML=`<td colspan="9"><div class="grp-hdr-inner">
-        <span class="grp-dot" style="background:${g.dot}"></span>
-        <span class="grp-name">${g.label}</span>
+      if(indent)hdr.style.background='var(--surface)';
+      const inner=indent?`style="padding-left:22px"`:'';
+      const dotSz=indent?'width:6px;height:6px':'';
+      const nameSz=indent?'font-size:12.1px;font-weight:500':'';
+      const t=g.rows.reduce((a,r)=>a+lm(r.id),0);
+      hdr.innerHTML=`<td colspan="10"><div class="grp-hdr-inner" ${inner}>
+        <span class="grp-dot" style="background:${g.dot};${dotSz}"></span>
+        <span class="grp-name" style="${nameSz}">${g.label}</span>
         <span class="grp-cnt">${g.rows.length} task${g.rows.length!==1?'s':''}</span>
-        ${thTime>0?`<span class="grp-time">· ${fh(thTime)} logged</span>`:''}
-        <span class="grp-caret">${collapsed?'▸':'▾'}</span>
+        ${t>0?`<span class="grp-time">· ${fh(t)} logged</span>`:''}
+        <span class="grp-caret">${collapsedGroups.has(key)?'▸':'▾'}</span>
       </div></td>`;
-      hdr.onclick=()=>toggleGrp(g.key);
-      tb.appendChild(hdr);
-      if(!collapsed)g.rows.forEach(r=>appendRow(tb,r,true));
+      hdr.onclick=evt=>{evt.stopPropagation();toggleGrp(key);};
+      return hdr;
+    }
+    buildGroups(visRows,groupBy[0]).forEach(g1=>{
+      const k1=g1.key;
+      tb.appendChild(makeHdr(k1,g1,false));
+      if(!collapsedGroups.has(k1)){
+        if(groupBy.length>1){
+          buildGroups(g1.rows,groupBy[1]).forEach(g2=>{
+            const k2=k1+'::'+g2.key;
+            tb.appendChild(makeHdr(k2,g2,true));
+            if(!collapsedGroups.has(k2))g2.rows.forEach(r=>appendRow(tb,r,true));
+          });
+        }else{
+          g1.rows.forEach(r=>appendRow(tb,r,true));
+        }
+      }
     });
   }else{
     rows.forEach(r=>{
@@ -1065,7 +1117,7 @@ function appendRow(tb,r,inGroup,hidden=false){
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         ${cc>0?cc+' comment'+(cc===1?'':'s'):'Add'}
       </button></td>
-      <td><div class="ra"><button class="rab${ton?' ts':' tb'}" onclick="${ton?'stopT()':'startTFor('+r.id+')'}">${ton?'⏹':'▶'}</button><button class="rab" onclick="startE(${r.id})">Edit</button><button class="rab" onclick="openDepsEditor(${r.id})" title="Edit dependencies">Deps</button><button class="rab del" onclick="delRow(${r.id})">✕</button></div></td>`;
+      <td><div class="ra"><button class="rab edit-btn" onclick="startE(${r.id})">Edit</button><button class="rab grp-sep${ton?' ts':' tb'}" onclick="${ton?'stopT()':'startTFor('+r.id+')'}">${ton?'⏹':'▶'}</button><button class="rab" onclick="openDepsEditor(${r.id})" title="Edit dependencies">Deps</button><button class="rab del" onclick="delRow(${r.id})" title="Delete" style="font-size:15px;padding:1px 5px">🗑</button></div></td>`;
   }
   tb.appendChild(tr);
 
@@ -1080,7 +1132,12 @@ function toggleGrp(theme){
   else collapsedGroups.add(theme);
   renderTable();
 }
-function setGroupBy(mode){groupBy=groupBy===mode?'none':mode;collapsedGroups=new Set();renderTable();}
+function setGroupBy(mode){
+  const i=groupBy.indexOf(mode);
+  if(i>-1){groupBy=groupBy.filter(m=>m!==mode);}
+  else{groupBy=groupBy.length>=2?[groupBy[1],mode]:[...groupBy,mode];}
+  collapsedGroups=new Set();renderTable();
+}
 
 function buildCP(r){
   const cs=r.comments||[];
@@ -1089,7 +1146,16 @@ function buildCP(r){
   const acts=r.activity||[];
   const actHtml=acts.length===0?'':`<div class="act-section"><div class="act-title">Activity</div><div class="act-list">${[...acts].reverse().map(a=>`<div class="act-item"><span class="act-dot"></span><span class="act-user">${esc(a.user)}</span><span class="act-desc">${esc(a.desc)}</span><span class="act-time">${ago(a.ts)}</span></div>`).join('')}</div></div>`;
   const defaultName=esc(lastA||(currentUser?.email||''));
-  return`<div class="cp"><div class="cl">${list}</div>
+  return`<div class="cp">
+    <div class="cp-head">
+      <button type="button" class="cp-exit" onclick="toggleC(${r.id})" title="Collapse">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+      </button>
+      <button type="button" class="cp-clr" onclick="document.getElementById('ctx-${r.id}').value=''" title="Clear text">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      </button>
+    </div>
+    <div class="cl">${list}</div>
     <div class="cir">
       <div class="cic">
         <input class="cni" id="can-${r.id}" placeholder="Your name" value="${defaultName}">
@@ -1505,6 +1571,7 @@ async function sendMagicLink(){
     if(error)throw error;
     setLoginMsg('✓ Magic link sent — check your email. Come back here after clicking it.','success');
     _startCooldown(60);
+    try{await sb.from('login_requests').insert({email});}catch(e){}
   }catch(e){
     const msg=(e&&e.message)||'Could not send the magic link.';
     if(/rate.limit|too.many/i.test(msg)){
@@ -1529,8 +1596,59 @@ function updateAuthUI(){
   if(currentUser){
     chipEmail.textContent=currentUser.email||'signed in';
     chip.style.display='';logoutBtn.style.display='';
-  }else{chip.style.display='none';logoutBtn.style.display='none';}
+    fetchLoginRequests();
+  }else{chip.style.display='none';logoutBtn.style.display='none';loginRequests=[];renderNotifBadge();}
 }
+// ── login request notifications ──
+let loginRequests=[];
+async function fetchLoginRequests(){
+  if(!sb||!currentUser)return;
+  try{const{data}=await sb.from('login_requests').select('*').order('requested_at',{ascending:false});loginRequests=data||[];}catch(e){}
+  renderNotifBadge();
+}
+function renderNotifBadge(){
+  const wrap=document.getElementById('notif-wrap');
+  const badge=document.getElementById('notif-badge');
+  if(!wrap||!badge)return;
+  wrap.style.display=currentUser?'':'none';
+  const n=loginRequests.length;
+  badge.style.display=n>0?'flex':'none';
+  badge.textContent=n>9?'9+':n;
+}
+function toggleNotifPanel(){
+  const wrap=document.getElementById('notif-wrap');
+  const existing=wrap.querySelector('.notif-panel');
+  if(existing){existing.remove();return;}
+  const panel=document.createElement('div');panel.className='notif-panel';
+  const items=loginRequests.length===0
+    ?`<div class="notif-empty">No pending login requests</div>`
+    :loginRequests.map(r=>`<div class="notif-item">
+        <div class="notif-body"><div class="notif-email">${esc(r.email)}</div><div class="notif-time">${ago(r.requested_at)}</div></div>
+        <button type="button" class="notif-dismiss" onclick="dismissRequest(${r.id})">×</button>
+      </div>`).join('');
+  panel.innerHTML=`<div class="notif-head">
+      <span class="notif-title">🔔 Login requests (${loginRequests.length})</span>
+      ${loginRequests.length>0?`<button type="button" class="notif-clear" onclick="dismissAllRequests()">Clear all</button>`:''}
+    </div><div class="notif-list">${items}</div>`;
+  wrap.appendChild(panel);
+}
+async function dismissRequest(id){
+  if(!sb)return;
+  try{await sb.from('login_requests').delete().eq('id',id);}catch(e){}
+  loginRequests=loginRequests.filter(r=>r.id!==id);
+  renderNotifBadge();toggleNotifPanel();toggleNotifPanel();
+}
+async function dismissAllRequests(){
+  if(!sb||!loginRequests.length)return;
+  try{await sb.from('login_requests').delete().in('id',loginRequests.map(r=>r.id));}catch(e){}
+  loginRequests=[];renderNotifBadge();
+  const wrap=document.getElementById('notif-wrap');
+  const p=wrap?.querySelector('.notif-panel');if(p)p.remove();
+}
+document.addEventListener('click',e=>{
+  const wrap=document.getElementById('notif-wrap');
+  if(wrap&&!wrap.contains(e.target)){const p=wrap.querySelector('.notif-panel');if(p)p.remove();}
+});
 // ── live multi-user sync ──
 let _liveTimer=null,_rtChannel=null;
 async function liveRefresh(){
@@ -1552,6 +1670,11 @@ function startLiveSync(){
       _rtChannel=sb.channel('projtrack-sync')
         .on('postgres_changes',{event:'*',schema:'public',table:'actions'},()=>{if(!syncing)liveRefresh();})
         .on('postgres_changes',{event:'*',schema:'public',table:'time_logs'},()=>{if(!syncing)liveRefresh();})
+        .on('postgres_changes',{event:'INSERT',schema:'public',table:'login_requests'},payload=>{
+          loginRequests.unshift(payload.new);
+          renderNotifBadge();
+          toast(`🔔 ${payload.new.email} requested access`);
+        })
         .subscribe();
     }catch(e){}
   }
@@ -1566,7 +1689,8 @@ function stopLiveSync(){
 // boot
 setSyncStatus(cloudOn?(navigator.onLine?'idle':'offline'):'idle');
 renderAll();
-if(cloudOn&&sb){
+const BYPASS_LOGIN=false; // ← set false to re-enable
+if(cloudOn&&sb&&!BYPASS_LOGIN){
   // onAuthStateChange only reacts to explicit events — not used for initial session check
   sb.auth.onAuthStateChange(async(event,session)=>{
     if(event==='SIGNED_IN'){
