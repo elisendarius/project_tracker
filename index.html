@@ -1650,26 +1650,57 @@ document.addEventListener('click',e=>{
   if(wrap&&!wrap.contains(e.target)){const p=wrap.querySelector('.notif-panel');if(p)p.remove();}
 });
 // ── live multi-user sync ──
-let _liveTimer=null,_rtChannel=null;
-async function liveRefresh(){
-  if(!cloudOn||!currentUser||syncing)return;
-  const data=await cloudPull();
-  if(data){
-    rows=data.rows;logs=data.logs;
-    nid=Math.max(20,...rows.map(r=>r.id||0))+1;
-    nlid=Math.max(100,...logs.map(l=>l.id||0))+1;
-    renderAll();
+let _liveTimer=null,_rtChannel=null,_refreshDebounce=null;
+function _mapRow(r){return{id:r.id,action:r.action,who:r.who||'',status:r.status||'Pending',priority:r.priority||'Medium',theme:r.theme||'General',start:r.start_date||'',due:r.due_date||'',est:r.est||0,comments:r.comments||[],activity:r.activity||[],deps:r.deps||[]};}
+function _mapLog(l){return{id:l.id,tid:l.tid,dur:l.dur||0,note:l.note||'',puk:l.puk||'',ts:l.ts||new Date().toISOString()};}
+function applyRTAction(evType,payload){
+  if(evType==='INSERT'||evType==='UPDATE'){
+    const row=_mapRow(payload.new);
+    const i=rows.findIndex(r=>r.id===row.id);
+    if(i>-1)rows[i]=row;else rows.push(row);
+    nid=Math.max(nid,row.id+1);
+  }else if(evType==='DELETE'&&payload.old){
+    rows=rows.filter(r=>r.id!==payload.old.id);
   }
+  saveLocal();renderTable();renderStats();setSyncStatus('idle');
+}
+function applyRTLog(evType,payload){
+  if(evType==='INSERT'||evType==='UPDATE'){
+    const log=_mapLog(payload.new);
+    const i=logs.findIndex(l=>l.id===log.id);
+    if(i>-1)logs[i]=log;else logs.push(log);
+    nlid=Math.max(nlid,log.id+1);
+  }else if(evType==='DELETE'&&payload.old){
+    logs=logs.filter(l=>l.id!==payload.old.id);
+  }
+  saveLocal();renderOverview();renderTL();setSyncStatus('idle');
+}
+async function liveRefresh(){
+  clearTimeout(_refreshDebounce);
+  _refreshDebounce=setTimeout(async()=>{
+    if(!cloudOn||!currentUser||syncing)return;
+    const data=await cloudPull();
+    if(data){
+      rows=data.rows;logs=data.logs;
+      nid=Math.max(20,...rows.map(r=>r.id||0))+1;
+      nlid=Math.max(100,...logs.map(l=>l.id||0))+1;
+      renderAll();
+    }
+  },300);
 }
 function startLiveSync(){
   stopLiveSync();
-  _liveTimer=setInterval(liveRefresh,90000);
+  _liveTimer=setInterval(liveRefresh,30000);
   window.addEventListener('focus',liveRefresh);
   if(sb&&sb.channel){
     try{
       _rtChannel=sb.channel('projtrack-sync')
-        .on('postgres_changes',{event:'*',schema:'public',table:'actions'},()=>{if(!syncing)liveRefresh();})
-        .on('postgres_changes',{event:'*',schema:'public',table:'time_logs'},()=>{if(!syncing)liveRefresh();})
+        .on('postgres_changes',{event:'*',schema:'public',table:'actions'},payload=>{
+          applyRTAction(payload.eventType,payload);
+        })
+        .on('postgres_changes',{event:'*',schema:'public',table:'time_logs'},payload=>{
+          applyRTLog(payload.eventType,payload);
+        })
         .on('postgres_changes',{event:'INSERT',schema:'public',table:'login_requests'},payload=>{
           loginRequests.unshift(payload.new);
           renderNotifBadge();
@@ -1680,6 +1711,7 @@ function startLiveSync(){
   }
 }
 function stopLiveSync(){
+  clearTimeout(_refreshDebounce);
   clearInterval(_liveTimer);_liveTimer=null;
   window.removeEventListener('focus',liveRefresh);
   if(_rtChannel){try{sb.removeChannel(_rtChannel);}catch(e){}}_rtChannel=null;
